@@ -8,6 +8,7 @@ import { ModulesProvider } from "./contexts/ModulesContext";
 import Home from "./pages/Home";
 import Course from "./pages/Course";
 import ModuleManager from "./pages/ModuleManager";
+import AdminLogin from "./pages/AdminLogin";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -15,6 +16,7 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/curso"} component={Course} />
+      <Route path={"/admin/login"} component={AdminLogin} />
       <Route path={"/admin/modulos"} component={ModuleManager} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

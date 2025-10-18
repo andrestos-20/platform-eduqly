@@ -3,7 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
-import { getAllModules, getModuleById, updateModule, createModule } from "./db";
+import { getAllModules, getModuleById, updateModule, createModule, verifyAdminCredentials, getAdminByEmail } from "./db";
 
 export const appRouter = router({
   system: systemRouter,
@@ -17,6 +17,22 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+  }),
+
+  admin: router({
+    login: publicProcedure
+      .input(z.object({ email: z.string().email(), ra: z.string() }))
+      .mutation(async ({ input }) => {
+        const isValid = await verifyAdminCredentials(input.email, input.ra);
+        if (!isValid) {
+          throw new Error("Email ou RA inválido");
+        }
+        const admin = await getAdminByEmail(input.email);
+        return {
+          success: true,
+          admin: admin,
+        };
+      }),
   }),
 
   modules: router({

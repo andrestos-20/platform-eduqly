@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS admins (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  name VARCHAR(255) NOT NULL,\n  email VARCHAR(320) NOT NULL UNIQUE,\n  ra VARCHAR(20) NOT NULL UNIQUE,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 25UUz7yB5XKTwj4.root --database e3R48g5bzAGTnDPJMwbifB --execute CREATE TABLE IF NOT EXISTS admins (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  name VARCHAR(255) NOT NULL,\n  email VARCHAR(320) NOT NULL UNIQUE,\n  ra VARCHAR(20) NOT NULL UNIQUE,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 170
+}

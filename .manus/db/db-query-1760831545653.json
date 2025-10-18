@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO admins (name, email, ra) VALUES \n('Alexandre Pires de Oliveira', 'Alexandrepires@uni9.edu.br', '922106556'),\n('André Vinícius Barros Santos', 'andrevinicius@uni9.edu.br', '922110614'),\n('Ellen Açucena Barros Santos', 'ellen.barros@uni9.edu.br', '922101089'),\n('Isabela Silva Vicente', 'isabela.vicente@uni9.edu.br', '922100895'),\n('Julia Paganini Marin', 'julia.paganini.marin@uni9.edu.br', '922106117'),\n('Melissa Vitória Silva Zanetoni', 'natalia420.lima@uni9.edu.br', '922108799'),\n('Nathalia Cristina de Jesus Lima', 'melissazanetoni10@uni9.edu.br', '922105467');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 25UUz7yB5XKTwj4.root --database e3R48g5bzAGTnDPJMwbifB --execute INSERT INTO admins (name, email, ra) VALUES \n('Alexandre Pires de Oliveira', 'Alexandrepires@uni9.edu.br', '922106556'),\n('André Vinícius Barros Santos', 'andrevinicius@uni9.edu.br', '922110614'),\n('Ellen Açucena Barros Santos', 'ellen.barros@uni9.edu.br', '922101089'),\n('Isabela Silva Vicente', 'isabela.vicente@uni9.edu.br', '922100895'),\n('Julia Paganini Marin', 'julia.paganini.marin@uni9.edu.br', '922106117'),\n('Melissa Vitória Silva Zanetoni', 'natalia420.lima@uni9.edu.br', '922108799'),\n('Nathalia Cristina de Jesus Lima', 'melissazanetoni10@uni9.edu.br', '922105467');",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 140
+}

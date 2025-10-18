@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, modules, InsertModule, Module } from "../drizzle/schema";
+import { InsertUser, users, modules, InsertModule, Module, admins } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -150,6 +150,45 @@ export async function createModule(data: InsertModule): Promise<Module | undefin
     return getModuleById(id);
   } catch (error) {
     console.error("[Database] Failed to create module:", error);
+    return undefined;
+  }
+}
+
+
+
+// Admin queries
+export async function verifyAdminCredentials(email: string, ra: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot verify admin: database not available");
+    return false;
+  }
+
+  try {
+    const result = await db.select().from(admins).where(eq(admins.email, email)).limit(1);
+    
+    if (result.length === 0) return false;
+    
+    const admin = result[0];
+    return admin.ra === ra;
+  } catch (error) {
+    console.error("[Database] Failed to verify admin:", error);
+    return false;
+  }
+}
+
+export async function getAdminByEmail(email: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get admin: database not available");
+    return undefined;
+  }
+
+  try {
+    const result = await db.select().from(admins).where(eq(admins.email, email)).limit(1);
+    return result.length > 0 ? result[0] : undefined;
+  } catch (error) {
+    console.error("[Database] Failed to get admin:", error);
     return undefined;
   }
 }
