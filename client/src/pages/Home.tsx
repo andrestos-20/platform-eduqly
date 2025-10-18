@@ -101,9 +101,11 @@ export default function Home() {
             <a href="#beneficios" className="text-slate-300 hover:text-white transition">Benefícios</a>
             <a href="#inscricao" className="text-slate-300 hover:text-white transition">Inscrição</a>
           </div>
-          <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
-            Acessar Curso
-          </Button>
+            <a href="/curso">
+              <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+                Acessar Curso
+              </Button>
+            </a>
         </div>
       </nav>
 
@@ -123,9 +125,11 @@ export default function Home() {
               Aprenda Power BI aplicado a Restaurantes e Negócios. Do achismo à decisão baseada em dados.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
+            <a href="/curso">
               <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
                 Quero Aprender Agora
               </Button>
+            </a>
               <Button size="lg" variant="outline" className="border-slate-600 text-white hover:bg-slate-800">
                 Saiba Mais
               </Button>
@@ -269,9 +273,11 @@ export default function Home() {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
-              Entrar no Curso Gratuito
-            </Button>
+            <a href="/curso">
+              <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
+                Entrar no Curso Gratuito
+              </Button>
+            </a>
             <Button size="lg" variant="outline" className="border-slate-600 text-white hover:bg-slate-800">
               Mais Informações
             </Button>
