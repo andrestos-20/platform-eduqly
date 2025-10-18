@@ -1,9 +1,14 @@
+import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronDown, CheckCircle2, BarChart3, Zap, Users, Award, Settings } from "lucide-react";
 import { useState } from "react";
 
 export default function Home() {
+  // The userAuth hooks provides authentication state
+  // To implement login/logout functionality, simply call logout() or redirect to getLoginUrl()
+  let { user, loading, error, isAuthenticated, logout } = useAuth();
+
   const [expandedModule, setExpandedModule] = useState<number | null>(null);
 
   const modules = [

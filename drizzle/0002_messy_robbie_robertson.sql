@@ -1,0 +1,1 @@
+ALTER TABLE `modules` MODIFY COLUMN `files` json NOT NULL DEFAULT (json_array());
