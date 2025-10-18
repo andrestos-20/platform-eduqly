@@ -17,15 +17,15 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useState } from "react";
+import { useModules, ModuleFile } from "@/contexts/ModulesContext";
 
-interface ModuleFile {
-  id: string;
-  type: "video" | "audio" | "pdf" | "powerpoint" | "iframe";
-  name: string;
-  url?: string;
-  iframeCode?: string;
-  uploadedAt: string;
-}
+export default function ModuleManager() {
+  const { modules, updateModule } = useModules();
+  const [selectedModuleId, setSelectedModuleId] = useState(1);
+
+  const [editingModule, setEditingModule] = useState<any>(null);
+  const [uploadingFileType, setUploadingFileType] = useState<string | null>(null);
+  const [previewFile, setPreviewFile] = useState<ModuleFile | null>(null);
 
 interface Module {
   id: number;
@@ -37,115 +37,6 @@ interface Module {
   files: ModuleFile[];
 }
 
-export default function ModuleManager() {
-  const [selectedModuleId, setSelectedModuleId] = useState(1);
-  const [modules, setModules] = useState<Module[]>([
-    {
-      id: 1,
-      title: "Introdução ao tema: Por que analisar dados?",
-      instructor: "Isabela",
-      duration: "5 min",
-      format: "Vídeo introdutório",
-      description:
-        "Entenda a importância fundamental da análise de dados para decisões estratégicas.",
-      files: [
-        {
-          id: "1-1",
-          type: "video",
-          name: "introducao.mp4",
-          url: "https://example.com/videos/introducao.mp4",
-          uploadedAt: "2025-01-15",
-        },
-        {
-          id: "1-2",
-          type: "audio",
-          name: "aula_audio.mp3",
-          url: "https://example.com/audios/aula.mp3",
-          uploadedAt: "2025-01-15",
-        },
-      ],
-    },
-    {
-      id: 2,
-      title: "Conceitos e Fundamentos do Power BI",
-      instructor: "Julia",
-      duration: "15 min",
-      format: "Slides narrados / e-book",
-      description: "Aprenda os conceitos essenciais do Power BI.",
-      files: [
-        {
-          id: "2-1",
-          type: "powerpoint",
-          name: "slides_powerbi.pptx",
-          url: "https://example.com/slides/powerbi.pptx",
-          uploadedAt: "2025-01-16",
-        },
-        {
-          id: "2-2",
-          type: "pdf",
-          name: "ebook_powerbi.pdf",
-          url: "https://example.com/pdfs/ebook.pdf",
-          uploadedAt: "2025-01-16",
-        },
-      ],
-    },
-    {
-      id: 3,
-      title: "Aplicações Práticas na Administração e Restaurantes",
-      instructor: "Melissa, Ellen",
-      duration: "20 min",
-      format: "Estudo de caso",
-      description: "Veja exemplos reais de como usar Power BI em negócios.",
-      files: [
-        {
-          id: "3-1",
-          type: "pdf",
-          name: "caso_estudo.pdf",
-          url: "https://example.com/pdfs/caso.pdf",
-          uploadedAt: "2025-01-17",
-        },
-      ],
-    },
-    {
-      id: 4,
-      title: "Tutorial Passo a Passo no Power BI",
-      instructor: "André, Alexandre",
-      duration: "30 min",
-      format: "Screencast / guia prático",
-      description: "Aprenda na prática como criar dashboards.",
-      files: [
-        {
-          id: "4-1",
-          type: "video",
-          name: "tutorial_screencast.mp4",
-          url: "https://example.com/videos/tutorial.mp4",
-          uploadedAt: "2025-01-18",
-        },
-      ],
-    },
-    {
-      id: 5,
-      title: "Atividade Interativa (Quiz)",
-      instructor: "Nathalia",
-      duration: "10 min",
-      format: "Kahoot / Google Forms",
-      description: "Teste seus conhecimentos com perguntas interativas.",
-      files: [
-        {
-          id: "5-1",
-          type: "iframe",
-          name: "Kahoot Quiz",
-          iframeCode: '<iframe src="https://kahoot.it/quiz" width="100%" height="600"></iframe>',
-          uploadedAt: "2025-01-19",
-        },
-      ],
-    },
-  ]);
-
-  const [editingModule, setEditingModule] = useState<Module | null>(null);
-  const [uploadingFileType, setUploadingFileType] = useState<string | null>(null);
-  const [previewFile, setPreviewFile] = useState<ModuleFile | null>(null);
-
   const currentModule = modules.find((m) => m.id === selectedModuleId);
 
   const handleModuleChange = (field: string, value: string) => {
@@ -156,25 +47,24 @@ export default function ModuleManager() {
 
   const handleSaveModule = () => {
     if (editingModule) {
-      setModules(
-        modules.map((m) => (m.id === editingModule.id ? editingModule : m))
-      );
+      updateModule(editingModule);
       setEditingModule(null);
     }
   };
 
   const handleDeleteFile = (fileId: string) => {
     if (editingModule) {
-      setEditingModule({
+      const updatedModule = {
         ...editingModule,
-        files: editingModule.files.filter((f) => f.id !== fileId),
-      });
+        files: editingModule.files.filter((f: any) => f.id !== fileId),
+      };
+      setEditingModule(updatedModule);
     }
   };
 
   const handleAddFile = (fileType: "video" | "audio" | "pdf" | "powerpoint" | "iframe") => {
     if (editingModule) {
-      const newFile: ModuleFile = {
+      const newFile: any = {
         id: `${editingModule.id}-${Date.now()}`,
         type: fileType,
         name: `novo_${fileType}.${getFileExtension(fileType)}`,
@@ -475,13 +365,13 @@ export default function ModuleManager() {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {displayModule.files.map((file) => (
+                    {displayModule.files.map((file: ModuleFile) => (
                       <div
                         key={file.id}
                         className="bg-slate-700/30 border border-slate-600 rounded-lg p-4 flex items-start justify-between hover:bg-slate-700/50 transition"
                       >
                         <div className="flex items-start gap-3 flex-1 min-w-0">
-                          <div className="mt-1 text-purple-400">{getFileIcon(file.type)}</div>
+                          <div className="mt-1 text-purple-400">{getFileIcon(file.type as string)}</div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="text-sm font-medium text-white">

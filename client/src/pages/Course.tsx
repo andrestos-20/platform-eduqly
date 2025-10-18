@@ -3,63 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ChevronRight, Play, CheckCircle2, Circle, Clock, User, Volume2, Download, Share2, MessageCircle } from "lucide-react";
 import { useState } from "react";
+import { useModules } from "@/contexts/ModulesContext";
 
 export default function Course() {
+  const { modules } = useModules();
   const [currentModuleId, setCurrentModuleId] = useState(1);
   const [completedModules, setCompletedModules] = useState<number[]>([]);
-
-  const modules = [
-    {
-      id: 1,
-      title: "Introdução ao tema: Por que analisar dados?",
-      duration: "5 min",
-      instructor: "Isabela",
-      format: "Vídeo introdutório",
-      description: "Entenda a importância fundamental da análise de dados para decisões estratégicas. Nesta aula introdutória, exploraremos como dados transformam negócios e por que a análise é essencial no contexto empresarial moderno.",
-      audioUrl: "#",
-      imageUrl: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=400&fit=crop"
-    },
-    {
-      id: 2,
-      title: "Conceitos e Fundamentos do Power BI",
-      duration: "15 min",
-      instructor: "Julia",
-      format: "Slides narrados / e-book",
-      description: "Aprenda os conceitos essenciais do Power BI, sua interface e como começar. Você entenderá a estrutura básica da ferramenta e como ela pode ser usada para criar visualizações poderosas.",
-      audioUrl: "#",
-      imageUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=400&fit=crop"
-    },
-    {
-      id: 3,
-      title: "Aplicações Práticas na Administração e Restaurantes",
-      duration: "20 min",
-      instructor: "Melissa, Ellen",
-      format: "Estudo de caso",
-      description: "Veja exemplos reais de como usar Power BI em negócios, especialmente em restaurantes. Analisaremos casos de sucesso e como dados podem melhorar operações e rentabilidade.",
-      audioUrl: "#",
-      imageUrl: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=400&fit=crop"
-    },
-    {
-      id: 4,
-      title: "Tutorial Passo a Passo no Power BI",
-      duration: "30 min",
-      instructor: "André, Alexandre",
-      format: "Screencast / guia prático",
-      description: "Aprenda na prática como criar dashboards e visualizações. Este tutorial prático o guiará através de cada passo para criar seu primeiro dashboard funcional.",
-      audioUrl: "#",
-      imageUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&h=400&fit=crop"
-    },
-    {
-      id: 5,
-      title: "Atividade Interativa (Quiz)",
-      duration: "10 min",
-      instructor: "Nathalia",
-      format: "Kahoot / Google Forms",
-      description: "Teste seus conhecimentos com perguntas interativas. Este quiz avaliará sua compreensão dos conceitos aprendidos e ajudará a consolidar o conhecimento.",
-      audioUrl: "#",
-      imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f70d504f0?w=800&h=400&fit=crop"
-    }
-  ];
 
   const currentModule = modules.find(m => m.id === currentModuleId);
   const totalDuration = modules.reduce((acc, m) => {
@@ -140,15 +89,8 @@ export default function Course() {
 
                 {/* Module Image */}
                 <div className="relative overflow-hidden rounded-xl aspect-video bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30">
-                  <img
-                    src={currentModule.imageUrl}
-                    alt={currentModule.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent flex items-center justify-center">
-                    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur hover:bg-white/30 transition cursor-pointer">
-                      <Play className="w-8 h-8 text-white fill-white" />
-                    </div>
+                  <div className="w-full h-full bg-gradient-to-br from-slate-700 to-slate-600 flex items-center justify-center">
+                    <Play className="w-16 h-16 text-slate-400" />
                   </div>
                 </div>
 
