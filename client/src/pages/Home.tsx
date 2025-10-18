@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronDown, CheckCircle2, BarChart3, Zap, Users, Award } from "lucide-react";
+import { ChevronDown, CheckCircle2, BarChart3, Zap, Users, Award, Settings } from "lucide-react";
 import { useState } from "react";
 
 export default function Home() {
@@ -98,14 +98,22 @@ export default function Home() {
           </div>
           <div className="hidden md:flex items-center gap-8">
             <a href="#estrutura" className="text-slate-300 hover:text-white transition">Estrutura</a>
-            <a href="#beneficios" className="text-slate-300 hover:text-white transition">Benefícios</a>
-            <a href="#inscricao" className="text-slate-300 hover:text-white transition">Inscrição</a>
+            <a href="#beneficios" className="text-slate-300 hover:text-white transition">Beneficios</a>
+            <a href="#inscricao" className="text-slate-300 hover:text-white transition">Inscricao</a>
           </div>
+          <div className="flex items-center gap-3">
+            <a href="/admin/modulos">
+              <Button variant="outline" className="border-slate-600 text-white hover:bg-slate-800 flex items-center gap-2">
+                <Settings className="w-4 h-4" />
+                <span className="hidden sm:inline">Admin</span>
+              </Button>
+            </a>
             <a href="/curso">
               <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
                 Acessar Curso
               </Button>
             </a>
+          </div>
         </div>
       </nav>
 
