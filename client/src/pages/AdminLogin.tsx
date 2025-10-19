@@ -70,7 +70,7 @@ export default function AdminLogin() {
 
             {/* RA Input */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-slate-300">RA (Senha)</label>
+              <label className="block text-sm font-medium text-slate-300">Senha</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 w-4 h-4 text-slate-500" />
                 <Input
