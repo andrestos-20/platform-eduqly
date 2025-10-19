@@ -138,7 +138,7 @@ export default function Home() {
               Aprenda Power BI aplicado a Restaurantes e Negócios. Do achismo à decisão baseada em dados.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-            <a href="/curso">
+            <a href="/login">
               <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
                 Quero Aprender Agora
               </Button>
@@ -286,7 +286,7 @@ export default function Home() {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="/curso">
+            <a href="/login">
               <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
                 Entrar no Curso Gratuito
               </Button>
