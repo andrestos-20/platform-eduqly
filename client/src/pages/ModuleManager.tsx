@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ChevronLeft, Trash2, Eye, Plus, Loader } from "lucide-react";
+import { ChevronLeft, Trash2, Eye, Plus, Loader, X, Globe, Youtube, FileText, Music } from "lucide-react";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 
@@ -12,6 +12,9 @@ export default function ModuleManager() {
   const [selectedModuleId, setSelectedModuleId] = useState(modules[0]?.id || 1);
   const [isEditing, setIsEditing] = useState(false);
   const [previewFile, setPreviewFile] = useState<any>(null);
+  const [showAddMaterial, setShowAddMaterial] = useState(false);
+  const [newMaterialType, setNewMaterialType] = useState("");
+  const [newMaterialData, setNewMaterialData] = useState({ name: "", url: "", file: null as File | null });
 
   const selectedModule = modules.find(m => m.id === selectedModuleId);
 
@@ -36,18 +39,43 @@ export default function ModuleManager() {
     await handleSaveModule({ files: updatedFiles });
   };
 
-  const handleAddFile = async (type: string) => {
-    if (!selectedModule) return;
+  const handleAddMaterial = async () => {
+    if (!selectedModule || !newMaterialType || !newMaterialData.name) return;
     
-    const newFile = {
-      id: `file-${Date.now()}`,
-      type: type as any,
-      name: `Novo ${type}`,
+    const newMaterial = {
+      id: `material-${Date.now()}`,
+      type: newMaterialType,
+      name: newMaterialData.name,
+      url: newMaterialData.url || null,
       uploadedAt: new Date().toISOString(),
     };
     
-    const updatedFiles = [...selectedModule.files, newFile];
+    const updatedFiles = [...selectedModule.files, newMaterial];
     await handleSaveModule({ files: updatedFiles });
+    
+    setNewMaterialType("");
+    setNewMaterialData({ name: "", url: "", file: null });
+    setShowAddMaterial(false);
+  };
+
+  const getMaterialIcon = (type: string) => {
+    switch(type) {
+      case "webpage": return <Globe className="w-4 h-4" />;
+      case "youtube": return <Youtube className="w-4 h-4" />;
+      case "file": return <FileText className="w-4 h-4" />;
+      case "audio": return <Music className="w-4 h-4" />;
+      default: return <FileText className="w-4 h-4" />;
+    }
+  };
+
+  const getMaterialTypeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      webpage: "Página Web",
+      youtube: "Vídeo YouTube",
+      file: "Arquivo",
+      audio: "Áudio"
+    };
+    return labels[type] || type;
   };
 
   if (isLoading) {
@@ -114,7 +142,7 @@ export default function ModuleManager() {
                   >
                     <p className="text-sm font-semibold text-white">Módulo {module.id}</p>
                     <p className="text-xs text-slate-400 line-clamp-2">{module.title}</p>
-                    <p className="text-xs text-slate-500 mt-1">{module.files.length} arquivo(s)</p>
+                    <p className="text-xs text-slate-500 mt-1">{module.files.length} material(is)</p>
                   </button>
                 ))}
               </CardContent>
@@ -187,20 +215,26 @@ export default function ModuleManager() {
                   </CardContent>
                 </Card>
 
-                {/* Files Section */}
+                {/* Materials Section */}
                 <Card className="bg-slate-800/50 border-slate-700">
                   <CardHeader>
-                    <CardTitle className="text-white">Arquivos e Recursos ({selectedModule.files.length})</CardTitle>
+                    <CardTitle className="text-white">Materiais e Recursos ({selectedModule.files.length})</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {/* File List */}
+                    {/* Material List */}
                     {selectedModule.files.length > 0 && (
                       <div className="space-y-2">
                         {selectedModule.files.map((file) => (
-                          <div key={file.id} className="flex items-center justify-between p-3 bg-slate-900 rounded border border-slate-700">
-                            <div>
-                              <p className="text-white text-sm font-medium">{file.name}</p>
-                              <p className="text-slate-500 text-xs">{file.type}</p>
+                          <div key={file.id} className="flex items-center justify-between p-3 bg-slate-900 rounded border border-slate-700 hover:border-slate-600 transition">
+                            <div className="flex items-center gap-3 flex-1">
+                              <div className="text-purple-400">
+                                {getMaterialIcon(file.type)}
+                              </div>
+                              <div>
+                                <p className="text-white text-sm font-medium">{file.name}</p>
+                                <p className="text-slate-500 text-xs">{getMaterialTypeLabel(file.type)}</p>
+                                {file.url && <p className="text-slate-600 text-xs truncate">{file.url}</p>}
+                              </div>
                             </div>
                             <div className="flex gap-2">
                               <Button
@@ -227,24 +261,120 @@ export default function ModuleManager() {
                       </div>
                     )}
 
-                    {/* Add Files */}
+                    {/* Add Material Section */}
                     {isEditing && (
-                      <div className="space-y-2 pt-4 border-t border-slate-700">
-                        <p className="text-sm text-slate-300 font-medium">Adicionar Arquivo</p>
-                        <div className="grid grid-cols-2 gap-2">
-                          {["video", "audio", "pdf", "powerpoint", "iframe"].map((type) => (
-                            <Button
-                              key={type}
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleAddFile(type)}
-                              className="border-slate-600 text-slate-300 hover:bg-slate-800"
-                            >
-                              <Plus className="w-4 h-4 mr-2" />
-                              {type.charAt(0).toUpperCase() + type.slice(1)}
-                            </Button>
-                          ))}
-                        </div>
+                      <div className="pt-4 border-t border-slate-700">
+                        {!showAddMaterial ? (
+                          <Button
+                            onClick={() => setShowAddMaterial(true)}
+                            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                          >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Adicionar Material
+                          </Button>
+                        ) : (
+                          <div className="space-y-4 p-4 bg-slate-900 rounded border border-slate-700">
+                            <div className="flex items-center justify-between mb-4">
+                              <h3 className="text-white font-semibold">Novo Material</h3>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => setShowAddMaterial(false)}
+                                className="text-slate-400 hover:text-white"
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </div>
+
+                            {/* Material Type Selection */}
+                            <div>
+                              <label className="block text-sm font-medium text-slate-300 mb-2">Tipo de Material</label>
+                              <div className="grid grid-cols-2 gap-2">
+                                {[
+                                  { id: "webpage", label: "Página Web", icon: Globe },
+                                  { id: "youtube", label: "Vídeo YouTube", icon: Youtube },
+                                  { id: "file", label: "Arquivo", icon: FileText },
+                                  { id: "audio", label: "Áudio", icon: Music }
+                                ].map((type) => (
+                                  <button
+                                    key={type.id}
+                                    onClick={() => setNewMaterialType(type.id)}
+                                    className={`p-3 rounded border transition flex items-center gap-2 ${
+                                      newMaterialType === type.id
+                                        ? "bg-purple-600/20 border-purple-500 text-purple-300"
+                                        : "bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-600"
+                                    }`}
+                                  >
+                                    <type.icon className="w-4 h-4" />
+                                    <span className="text-sm">{type.label}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Material Details */}
+                            {newMaterialType && (
+                              <>
+                                <div>
+                                  <label className="block text-sm font-medium text-slate-300 mb-2">Nome do Material</label>
+                                  <Input
+                                    placeholder="Ex: Introdução ao Power BI"
+                                    value={newMaterialData.name}
+                                    onChange={(e) => setNewMaterialData({ ...newMaterialData, name: e.target.value })}
+                                    className="bg-slate-800 border-slate-700 text-white"
+                                  />
+                                </div>
+
+                                {(newMaterialType === "webpage" || newMaterialType === "youtube") && (
+                                  <div>
+                                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                                      {newMaterialType === "youtube" ? "URL do Vídeo YouTube" : "URL da Página"}
+                                    </label>
+                                    <Input
+                                      placeholder={newMaterialType === "youtube" ? "https://youtube.com/watch?v=..." : "https://..."}
+                                      value={newMaterialData.url}
+                                      onChange={(e) => setNewMaterialData({ ...newMaterialData, url: e.target.value })}
+                                      className="bg-slate-800 border-slate-700 text-white"
+                                    />
+                                  </div>
+                                )}
+
+                                {(newMaterialType === "file" || newMaterialType === "audio") && (
+                                  <div>
+                                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                                      {newMaterialType === "audio" ? "Arquivo de Áudio" : "Arquivo"}
+                                    </label>
+                                    <Input
+                                      type="file"
+                                      onChange={(e) => setNewMaterialData({ ...newMaterialData, file: e.target.files?.[0] || null })}
+                                      className="bg-slate-800 border-slate-700 text-white"
+                                    />
+                                  </div>
+                                )}
+
+                                <div className="flex gap-2 pt-2">
+                                  <Button
+                                    onClick={handleAddMaterial}
+                                    className="flex-1 bg-green-600 hover:bg-green-700"
+                                  >
+                                    Adicionar
+                                  </Button>
+                                  <Button
+                                    onClick={() => {
+                                      setShowAddMaterial(false);
+                                      setNewMaterialType("");
+                                      setNewMaterialData({ name: "", url: "", file: null });
+                                    }}
+                                    variant="outline"
+                                    className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-800"
+                                  >
+                                    Cancelar
+                                  </Button>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        )}
                       </div>
                     )}
                   </CardContent>
@@ -272,11 +402,15 @@ export default function ModuleManager() {
             </CardHeader>
             <CardContent>
               <div className="bg-slate-900 rounded p-8 text-center text-slate-400">
-                <p>Preview de {previewFile.type}</p>
-                {previewFile.url && <p className="text-sm mt-2">{previewFile.url}</p>}
-                {previewFile.iframeCode && (
-                  <div className="mt-4 text-left bg-slate-800 p-4 rounded text-xs font-mono overflow-auto max-h-48">
-                    {previewFile.iframeCode}
+                <div className="flex justify-center mb-4">
+                  {getMaterialIcon(previewFile.type)}
+                </div>
+                <p className="font-semibold text-white mb-2">{getMaterialTypeLabel(previewFile.type)}</p>
+                <p>{previewFile.name}</p>
+                {previewFile.url && (
+                  <div className="mt-4">
+                    <p className="text-sm text-slate-300 mb-2">URL:</p>
+                    <p className="text-xs break-all bg-slate-800 p-2 rounded">{previewFile.url}</p>
                   </div>
                 )}
               </div>

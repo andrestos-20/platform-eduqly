@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { ChevronRight, Play, CheckCircle2, Circle, Clock, User, Volume2, Download, Share2, MessageCircle, Loader } from "lucide-react";
+import { ChevronRight, Play, CheckCircle2, Circle, Clock, User, Volume2, Download, Share2, MessageCircle, Loader, Globe, Youtube, FileText, Music, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 
@@ -33,6 +33,26 @@ export default function Course() {
     if (currentModuleId < modules.length) {
       setCurrentModuleId(currentModuleId + 1);
     }
+  };
+
+  const getMaterialIcon = (type: string) => {
+    switch(type) {
+      case "webpage": return <Globe className="w-5 h-5" />;
+      case "youtube": return <Youtube className="w-5 h-5" />;
+      case "file": return <FileText className="w-5 h-5" />;
+      case "audio": return <Music className="w-5 h-5" />;
+      default: return <FileText className="w-5 h-5" />;
+    }
+  };
+
+  const getMaterialTypeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      webpage: "Página Web",
+      youtube: "Vídeo YouTube",
+      file: "Arquivo",
+      audio: "Áudio"
+    };
+    return labels[type] || type;
   };
 
   if (isLoading) {
@@ -99,103 +119,122 @@ export default function Course() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <Progress value={progressPercentage} className="h-2" />
-                    <p className="text-slate-400 text-sm">{completedMinutes} de {totalDuration} minutos concluídos</p>
+                    <div className="flex justify-between text-sm text-slate-400">
+                      <span>{completedMinutes} de {totalDuration} minutos concluídos</span>
+                    </div>
                   </CardContent>
                 </Card>
 
-                {/* Module Content */}
+                {/* Description */}
                 <Card className="bg-slate-800/50 border-slate-700">
                   <CardHeader>
-                    <CardTitle className="text-white">Conteúdo do Módulo</CardTitle>
+                    <CardTitle className="text-white">Sobre esta aula</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-6">
-                    {/* Video/Audio Player */}
-                    <div className="bg-slate-900 rounded-lg p-8 flex items-center justify-center min-h-64">
-                      <div className="text-center space-y-4">
-                        <Play className="w-16 h-16 text-purple-500 mx-auto" />
-                        <p className="text-slate-400">Player de mídia</p>
-                        <p className="text-sm text-slate-500">Formato: {currentModule.format}</p>
-                      </div>
-                    </div>
+                  <CardContent>
+                    <p className="text-slate-300 leading-relaxed">{currentModule.description}</p>
+                  </CardContent>
+                </Card>
 
-                    {/* Description */}
-                    <div className="space-y-2">
-                      <h3 className="text-lg font-semibold text-white">Sobre esta aula</h3>
-                      <p className="text-slate-300">{currentModule.description}</p>
-                    </div>
-
-                    {/* Files */}
-                    {currentModule.files && currentModule.files.length > 0 && (
-                      <div className="space-y-3">
-                        <h3 className="text-lg font-semibold text-white">Recursos</h3>
-                        {currentModule.files.map((file) => (
-                          <div key={file.id} className="flex items-center justify-between p-3 bg-slate-900 rounded border border-slate-700">
-                            <div className="flex items-center gap-3">
-                              <Download className="w-4 h-4 text-purple-400" />
-                              <div>
-                                <p className="text-white text-sm">{file.name}</p>
-                                <p className="text-slate-500 text-xs">{file.type}</p>
-                              </div>
+                {/* Materials Section */}
+                {currentModule.files && currentModule.files.length > 0 && (
+                  <Card className="bg-slate-800/50 border-slate-700">
+                    <CardHeader>
+                      <CardTitle className="text-white">Materiais e Recursos</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {currentModule.files.map((material: any) => (
+                        <div
+                          key={material.id}
+                          className="flex items-center justify-between p-4 bg-slate-900/50 rounded-lg border border-slate-700 hover:border-purple-500 transition group"
+                        >
+                          <div className="flex items-center gap-3 flex-1">
+                            <div className="text-purple-400 bg-slate-800 p-2 rounded">
+                              {getMaterialIcon(material.type)}
                             </div>
-                            <Button size="sm" variant="ghost" className="text-purple-400 hover:text-purple-300">
-                              Baixar
-                            </Button>
+                            <div className="flex-1">
+                              <p className="text-white font-medium">{material.name}</p>
+                              <p className="text-slate-500 text-sm">{getMaterialTypeLabel(material.type)}</p>
+                            </div>
                           </div>
-                        ))}
-                      </div>
+                          {material.url && (
+                            <a
+                              href={material.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded text-sm transition opacity-0 group-hover:opacity-100"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                              Acessar
+                            </a>
+                          )}
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex gap-3">
+                  <Button
+                    onClick={() => toggleModuleCompletion(currentModule.id)}
+                    className={completedModules.includes(currentModule.id) ? "bg-green-600 hover:bg-green-700 flex-1" : "bg-purple-600 hover:bg-purple-700 flex-1"}
+                  >
+                    {completedModules.includes(currentModule.id) ? (
+                      <>
+                        <CheckCircle2 className="w-4 h-4 mr-2" />
+                        Concluído
+                      </>
+                    ) : (
+                      <>
+                        <Circle className="w-4 h-4 mr-2" />
+                        Marcar como Concluído
+                      </>
                     )}
-
-                    {/* Actions */}
-                    <div className="flex gap-3 pt-4">
-                      <Button
-                        onClick={() => toggleModuleCompletion(currentModule.id)}
-                        className={completedModules.includes(currentModule.id) ? "bg-green-600 hover:bg-green-700" : "bg-purple-600 hover:bg-purple-700"}
-                      >
-                        {completedModules.includes(currentModule.id) ? (
-                          <>
-                            <CheckCircle2 className="w-4 h-4 mr-2" />
-                            Concluído
-                          </>
-                        ) : (
-                          <>
-                            <Circle className="w-4 h-4 mr-2" />
-                            Marcar como Concluído
-                          </>
-                        )}
-                      </Button>
-                      <Button onClick={handleNextModule} variant="outline" className="border-slate-600 text-white hover:bg-slate-800">
-                        Próximo Módulo
-                        <ChevronRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Contact Section */}
-                <Card className="bg-slate-800/50 border-slate-700">
-                  <CardHeader>
-                    <CardTitle className="text-white">Dúvidas?</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <p className="text-slate-300">Entre em contato conosco para suporte.</p>
-                    <Button className="w-full bg-purple-600 hover:bg-purple-700">
-                      <MessageCircle className="w-4 h-4 mr-2" />
-                      Enviar Mensagem
+                  </Button>
+                  {currentModuleId < modules.length && (
+                    <Button
+                      onClick={handleNextModule}
+                      className="bg-slate-700 hover:bg-slate-600 flex-1"
+                    >
+                      Próximo Módulo
+                      <ChevronRight className="w-4 h-4 ml-2" />
                     </Button>
-                  </CardContent>
-                </Card>
+                  )}
+                </div>
               </>
             )}
           </div>
 
-          {/* Sidebar - Module List */}
-          <div className="space-y-4">
+          {/* Sidebar */}
+          <div className="md:col-span-1">
+            {/* Course Info Card */}
+            <Card className="bg-slate-800/50 border-slate-700 mb-6">
+              <CardHeader>
+                <CardTitle className="text-white">Informações do Curso</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <p className="text-slate-500 text-sm">Duração Total</p>
+                  <p className="text-white font-semibold">{totalDuration} minutos</p>
+                </div>
+                <div>
+                  <p className="text-slate-500 text-sm">Módulos</p>
+                  <p className="text-white font-semibold">{modules.length} módulos</p>
+                </div>
+                <div>
+                  <p className="text-slate-500 text-sm">Progresso</p>
+                  <p className="text-white font-semibold">{progressPercentage}%</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Modules List */}
             <Card className="bg-slate-800/50 border-slate-700">
               <CardHeader>
                 <CardTitle className="text-white">Módulos</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                {modules.map((module) => (
+                {modules.map((module: any) => (
                   <button
                     key={module.id}
                     onClick={() => setCurrentModuleId(module.id)}
@@ -205,16 +244,16 @@ export default function Course() {
                         : "bg-slate-900/50 border-slate-700 hover:border-slate-600"
                     }`}
                   >
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-2">
                       {completedModules.includes(module.id) ? (
-                        <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                        <CheckCircle2 className="w-4 h-4 text-green-500 mt-1 flex-shrink-0" />
                       ) : (
-                        <Circle className="w-5 h-5 text-slate-500 mt-0.5 flex-shrink-0" />
+                        <Circle className="w-4 h-4 text-slate-500 mt-1 flex-shrink-0" />
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white truncate">Módulo {module.id}</p>
+                        <p className="text-sm font-semibold text-white">Módulo {module.id}</p>
                         <p className="text-xs text-slate-400 line-clamp-2">{module.title}</p>
-                        <p className="text-xs text-slate-500 mt-1">{module.files?.length || 0} arquivo(s)</p>
+                        <p className="text-xs text-slate-500 mt-1">{module.duration}</p>
                       </div>
                     </div>
                   </button>
@@ -222,24 +261,16 @@ export default function Course() {
               </CardContent>
             </Card>
 
-            {/* Course Info */}
-            <Card className="bg-slate-800/50 border-slate-700">
+            {/* Support Section */}
+            <Card className="bg-slate-800/50 border-slate-700 mt-6">
               <CardHeader>
-                <CardTitle className="text-white text-lg">Sobre o Curso</CardTitle>
+                <CardTitle className="text-white text-base">Precisa de ajuda?</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm">
-                <div>
-                  <p className="text-slate-400">Carga horária</p>
-                  <p className="text-white font-semibold">{totalDuration} minutos</p>
-                </div>
-                <div>
-                  <p className="text-slate-400">Modalidade</p>
-                  <p className="text-white font-semibold">Online</p>
-                </div>
-                <div>
-                  <p className="text-slate-400">Tecnologia</p>
-                  <p className="text-white font-semibold">Power BI</p>
-                </div>
+              <CardContent className="space-y-3">
+                <Button variant="outline" className="w-full border-slate-600 text-slate-300 hover:bg-slate-800">
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  Contato
+                </Button>
               </CardContent>
             </Card>
           </div>
@@ -248,4 +279,3 @@ export default function Course() {
     </div>
   );
 }
-
