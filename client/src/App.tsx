@@ -9,6 +9,8 @@ import Home from "./pages/Home";
 import Course from "./pages/Course";
 import ModuleManager from "./pages/ModuleManager";
 import AdminLogin from "./pages/AdminLogin";
+import StudentLogin from "./pages/StudentLogin";
+import AdminStudents from "./pages/AdminStudents";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -18,6 +20,8 @@ function Router() {
       <Route path={"/curso"} component={Course} />
       <Route path={"/admin/login"} component={AdminLogin} />
       <Route path={"/admin/modulos"} component={ModuleManager} />
+      <Route path={"/login"} component={StudentLogin} />
+      <Route path={"/admin/alunos"} component={AdminStudents} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, modules, InsertModule, Module, admins } from "../drizzle/schema";
+import { InsertUser, users, modules, InsertModule, Module, admins, students, Student, InsertStudent } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -189,6 +189,131 @@ export async function getAdminByEmail(email: string) {
     return result.length > 0 ? result[0] : undefined;
   } catch (error) {
     console.error("[Database] Failed to get admin:", error);
+    return undefined;
+  }
+}
+
+
+
+
+// Student queries
+export async function getAllStudents(): Promise<Student[]> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get students: database not available");
+    return [];
+  }
+
+  try {
+    const result = await db.select().from(students).orderBy(students.id);
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to get students:", error);
+    return [];
+  }
+}
+
+export async function getStudentById(id: number): Promise<Student | undefined> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get student: database not available");
+    return undefined;
+  }
+
+  try {
+    const result = await db.select().from(students).where(eq(students.id, id)).limit(1);
+    return result.length > 0 ? result[0] : undefined;
+  } catch (error) {
+    console.error("[Database] Failed to get student:", error);
+    return undefined;
+  }
+}
+
+export async function getStudentByEmail(email: string): Promise<Student | undefined> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get student: database not available");
+    return undefined;
+  }
+
+  try {
+    const result = await db.select().from(students).where(eq(students.email, email)).limit(1);
+    return result.length > 0 ? result[0] : undefined;
+  } catch (error) {
+    console.error("[Database] Failed to get student:", error);
+    return undefined;
+  }
+}
+
+export async function createStudent(data: InsertStudent): Promise<Student | undefined> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create student: database not available");
+    return undefined;
+  }
+
+  try {
+    const result = await db.insert(students).values(data);
+    const id = (result as any).insertId || result[0];
+    return getStudentById(Number(id));
+  } catch (error) {
+    console.error("[Database] Failed to create student:", error);
+    return undefined;
+  }
+}
+
+export async function updateStudent(id: number, data: Partial<InsertStudent>): Promise<Student | undefined> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update student: database not available");
+    return undefined;
+  }
+
+  try {
+    await db.update(students).set(data).where(eq(students.id, id));
+    return getStudentById(id);
+  } catch (error) {
+    console.error("[Database] Failed to update student:", error);
+    return undefined;
+  }
+}
+
+export async function deleteStudent(id: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot delete student: database not available");
+    return false;
+  }
+
+  try {
+    await db.delete(students).where(eq(students.id, id));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to delete student:", error);
+    return false;
+  }
+}
+
+export async function verifyStudentCredentials(email: string, password: string): Promise<Student | undefined> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot verify student: database not available");
+    return undefined;
+  }
+
+  try {
+    const result = await db.select().from(students).where(eq(students.email, email)).limit(1);
+    
+    if (result.length === 0) return undefined;
+    
+    const student = result[0];
+    // Simple password comparison (in production, use bcrypt or similar)
+    if (student.password === password && student.isActive === "true") {
+      return student;
+    }
+    return undefined;
+  } catch (error) {
+    console.error("[Database] Failed to verify student:", error);
     return undefined;
   }
 }

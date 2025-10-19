@@ -3,7 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
-import { getAllModules, getModuleById, updateModule, createModule, verifyAdminCredentials, getAdminByEmail } from "./db";
+import { getAllModules, getModuleById, updateModule, createModule, verifyAdminCredentials, getAdminByEmail, getAllStudents, getStudentById, createStudent, updateStudent, deleteStudent, verifyStudentCredentials } from "./db";
 
 export const appRouter = router({
   system: systemRouter,
@@ -31,6 +31,50 @@ export const appRouter = router({
         return {
           success: true,
           admin: admin,
+        };
+      }),
+    students: router({
+      list: publicProcedure.query(() => getAllStudents()),
+      getById: publicProcedure
+        .input(z.object({ id: z.number() }))
+        .query(({ input }) => getStudentById(input.id)),
+      create: publicProcedure
+        .input(z.object({
+          name: z.string(),
+          email: z.string().email(),
+          password: z.string(),
+          isActive: z.enum(["true", "false"]).optional(),
+        }))
+        .mutation(({ input }) => createStudent(input as any)),
+      update: publicProcedure
+        .input(z.object({
+          id: z.number(),
+          name: z.string().optional(),
+          email: z.string().email().optional(),
+          password: z.string().optional(),
+          isActive: z.enum(["true", "false"]).optional(),
+        }))
+        .mutation(({ input }) => {
+          const { id, ...data } = input;
+          return updateStudent(id, data as any);
+        }),
+      delete: publicProcedure
+        .input(z.object({ id: z.number() }))
+        .mutation(({ input }) => deleteStudent(input.id)),
+    }),
+  }),
+
+  student: router({
+    login: publicProcedure
+      .input(z.object({ email: z.string().email(), password: z.string() }))
+      .mutation(async ({ input }) => {
+        const student = await verifyStudentCredentials(input.email, input.password);
+        if (!student) {
+          throw new Error("Email ou senha inválidos");
+        }
+        return {
+          success: true,
+          student: student,
         };
       }),
   }),

@@ -113,7 +113,7 @@ export default function Home() {
                 <span className="hidden sm:inline">Admin</span>
               </Button>
             </a>
-            <a href="/curso">
+            <a href="/login">
               <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
                 Acessar Curso
               </Button>
