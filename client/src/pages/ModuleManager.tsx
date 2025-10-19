@@ -74,11 +74,18 @@ export default function ModuleManager() {
               <span className="font-bold text-white">PowerBI Academy</span>
             </a>
           </div>
-          <a href="/">
-            <Button variant="outline" className="border-slate-600 text-white hover:bg-slate-800">
-              Voltar
-            </Button>
-          </a>
+          <div className="flex gap-2">
+            <a href="/admin/alunos">
+              <Button className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700">
+                👥 Alunos
+              </Button>
+            </a>
+            <a href="/">
+              <Button variant="outline" className="border-slate-600 text-white hover:bg-slate-800">
+                Voltar
+              </Button>
+            </a>
+          </div>
         </div>
       </nav>
 

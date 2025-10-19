@@ -96,13 +96,21 @@ export default function AdminStudents() {
             <h1 className="text-3xl font-bold text-white">Gerenciar Alunos</h1>
             <p className="text-slate-400 mt-2">Adicione, edite ou remova alunos do curso</p>
           </div>
-          <Button
-            onClick={() => setLocation("/admin/modulos")}
-            variant="outline"
-            className="border-slate-600 text-white hover:bg-slate-800"
-          >
-            ← Voltar
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setLocation("/admin/modulos")}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+            >
+              📚 Módulos
+            </Button>
+            <Button
+              onClick={() => setLocation("/")}
+              variant="outline"
+              className="border-slate-600 text-white hover:bg-slate-800"
+            >
+              ← Voltar
+            </Button>
+          </div>
         </div>
 
         {/* Add Student Form */}
