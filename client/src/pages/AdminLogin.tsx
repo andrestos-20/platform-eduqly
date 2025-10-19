@@ -68,14 +68,14 @@ export default function AdminLogin() {
               </div>
             </div>
 
-            {/* RA Input */}
+            {/* Password Input */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-slate-300">Senha</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 w-4 h-4 text-slate-500" />
                 <Input
                   type="password"
-                  placeholder="Seu número de RA"
+                  placeholder="Digite sua senha"
                   value={ra}
                   onChange={(e) => setRa(e.target.value)}
                   className="pl-10 bg-slate-900 border-slate-700 text-white placeholder:text-slate-500"
@@ -108,13 +108,6 @@ export default function AdminLogin() {
                 "Entrar"
               )}
             </Button>
-
-            {/* Info Message */}
-            <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded text-blue-400 text-xs">
-              <p className="font-semibold mb-1">Credenciais:</p>
-              <p>Email: seu email institucional</p>
-              <p>Senha: seu número de RA</p>
-            </div>
           </form>
         </CardContent>
       </Card>
@@ -129,4 +122,3 @@ export default function AdminLogin() {
     </div>
   );
 }
-
