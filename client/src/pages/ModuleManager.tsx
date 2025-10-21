@@ -2,29 +2,71 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ChevronLeft, Trash2, Eye, Plus, Loader, X, Globe, Youtube, FileText, Music } from "lucide-react";
-import { useState } from "react";
+import { ChevronLeft, Trash2, Eye, Plus, Loader, X, Globe, Youtube, FileText, Music, Film, Presentation } from "lucide-react";
+import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 
 export default function ModuleManager() {
+  const utils = trpc.useUtils();
   const { data: modules = [], isLoading } = trpc.modules.list.useQuery();
-  const updateModuleMutation = trpc.modules.update.useMutation();
+  const updateModuleMutation = trpc.modules.update.useMutation({
+    onSuccess: () => {
+      utils.modules.list.invalidate();
+    },
+  });
+  
   const [selectedModuleId, setSelectedModuleId] = useState(modules[0]?.id || 1);
   const [isEditing, setIsEditing] = useState(false);
   const [previewFile, setPreviewFile] = useState<any>(null);
   const [showAddMaterial, setShowAddMaterial] = useState(false);
   const [newMaterialType, setNewMaterialType] = useState("");
-  const [newMaterialData, setNewMaterialData] = useState({ name: "", url: "", file: null as File | null });
+  const [newMaterialData, setNewMaterialData] = useState({ 
+    name: "", 
+    url: "", 
+    file: null as File | null,
+    iframeCode: ""
+  });
+  const [materialError, setMaterialError] = useState("");
+  const [isUploadingAudio, setIsUploadingAudio] = useState(false);
+
+  // Estados para edição de informações do módulo
+  const [editData, setEditData] = useState({
+    title: "",
+    instructor: "",
+    duration: "",
+    format: "",
+    description: ""
+  });
+
+  const uploadAudioMutation = trpc.modules.uploadAudio.useMutation();
 
   const selectedModule = modules.find(m => m.id === selectedModuleId);
 
-  const handleSaveModule = async (updates: any) => {
+  // Inicializar editData quando o módulo selecionado muda
+  useEffect(() => {
+    if (selectedModule) {
+      setEditData({
+        title: selectedModule.title || "",
+        instructor: selectedModule.instructor || "",
+        duration: selectedModule.duration || "",
+        format: selectedModule.format || "",
+        description: selectedModule.description || ""
+      });
+      setIsEditing(false);
+    }
+  }, [selectedModule]);
+
+  const handleSaveModule = async () => {
     if (!selectedModule) return;
     
     try {
       await updateModuleMutation.mutateAsync({
         id: selectedModule.id,
-        ...updates,
+        title: editData.title,
+        instructor: editData.instructor,
+        duration: editData.duration,
+        format: editData.format,
+        description: editData.description,
       });
       setIsEditing(false);
     } catch (error) {
@@ -36,34 +78,121 @@ export default function ModuleManager() {
     if (!selectedModule) return;
     
     const updatedFiles = selectedModule.files.filter(f => f.id !== fileId);
-    await handleSaveModule({ files: updatedFiles });
+    try {
+      await updateModuleMutation.mutateAsync({
+        id: selectedModule.id,
+        files: updatedFiles as any,
+      });
+    } catch (error) {
+      console.error("Erro ao deletar arquivo:", error);
+    }
+  };
+
+  const handleUploadAudio = async (file: File) => {
+    if (!file) return;
+    
+    setIsUploadingAudio(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const base64Data = (e.target?.result as string).split(',')[1];
+        const contentType = file.type || 'audio/mpeg';
+        
+        try {
+          const result = await uploadAudioMutation.mutateAsync({
+            fileName: file.name,
+            fileData: base64Data,
+            contentType,
+          });
+          
+          // Update the URL with the uploaded file URL
+          setNewMaterialData({ ...newMaterialData, url: result.url, file: null });
+          setMaterialError("");
+        } catch (error) {
+          setMaterialError(`Erro ao fazer upload do áudio: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+        } finally {
+          setIsUploadingAudio(false);
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      setMaterialError("Erro ao processar arquivo");
+      setIsUploadingAudio(false);
+    }
   };
 
   const handleAddMaterial = async () => {
-    if (!selectedModule || !newMaterialType || !newMaterialData.name) return;
+    setMaterialError("");
+    
+    if (!selectedModule || !newMaterialType || !newMaterialData.name) {
+      setMaterialError("Por favor, preencha o nome do material");
+      return;
+    }
+    
+    // Validar URL para tipos que requerem URL
+    if ((newMaterialType === "webpage" || newMaterialType === "youtube" || newMaterialType === "pdf" || newMaterialType === "powerpoint" || newMaterialType === "video" || newMaterialType === "audio") && !newMaterialData.url) {
+      setMaterialError(`Por favor, preencha a URL do material`);
+      return;
+    }
+
+    // Validar código iframe para tipo iframe
+    if (newMaterialType === "iframe" && !newMaterialData.iframeCode && !newMaterialData.url) {
+      setMaterialError("Por favor, preencha o código iframe ou a URL");
+      return;
+    }
+    
+    // Validar arquivo para tipos que requerem arquivo
+    if (newMaterialType === "file" && !newMaterialData.file) {
+      setMaterialError(`Por favor, selecione um arquivo`);
+      return;
+    }
+    
+    // Map frontend types to database types
+    const typeMap: Record<string, "video" | "audio" | "pdf" | "powerpoint" | "iframe" | "webpage"> = {
+      "youtube": "video",
+      "video": "video",
+      "webpage": "webpage",
+      "pdf": "pdf",
+      "powerpoint": "powerpoint",
+      "file": "pdf",
+      "audio": "audio",
+      "iframe": "iframe"
+    };
     
     const newMaterial = {
       id: `material-${Date.now()}`,
-      type: newMaterialType,
+      type: (typeMap[newMaterialType] || "video") as "video" | "audio" | "pdf" | "powerpoint" | "iframe" | "webpage",
       name: newMaterialData.name,
-      url: newMaterialData.url || null,
+      url: newMaterialData.url || undefined,
+      iframeCode: newMaterialType === "iframe" ? newMaterialData.iframeCode : undefined,
       uploadedAt: new Date().toISOString(),
     };
     
-    const updatedFiles = [...selectedModule.files, newMaterial];
-    await handleSaveModule({ files: updatedFiles });
-    
-    setNewMaterialType("");
-    setNewMaterialData({ name: "", url: "", file: null });
-    setShowAddMaterial(false);
+    const updatedFiles = [...(selectedModule.files || []), newMaterial];
+    try {
+      await updateModuleMutation.mutateAsync({
+        id: selectedModule.id,
+        files: updatedFiles as any,
+      });
+      
+      setNewMaterialType("");
+      setNewMaterialData({ name: "", url: "", file: null, iframeCode: "" });
+      setShowAddMaterial(false);
+      setMaterialError("");
+    } catch (error) {
+      setMaterialError("Erro ao adicionar material. Tente novamente.");
+      console.error("Erro ao adicionar material:", error);
+    }
   };
 
   const getMaterialIcon = (type: string) => {
     switch(type) {
       case "webpage": return <Globe className="w-4 h-4" />;
-      case "youtube": return <Youtube className="w-4 h-4" />;
-      case "file": return <FileText className="w-4 h-4" />;
+      case "video": return <Youtube className="w-4 h-4" />;
+      case "pdf": return <FileText className="w-4 h-4" />;
       case "audio": return <Music className="w-4 h-4" />;
+      case "powerpoint": return <Presentation className="w-4 h-4" />;
+      case "iframe": return <Film className="w-4 h-4" />;
       default: return <FileText className="w-4 h-4" />;
     }
   };
@@ -71,9 +200,11 @@ export default function ModuleManager() {
   const getMaterialTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
       webpage: "Página Web",
-      youtube: "Vídeo YouTube",
-      file: "Arquivo",
-      audio: "Áudio"
+      video: "Vídeo",
+      pdf: "PDF",
+      audio: "Áudio",
+      powerpoint: "PowerPoint",
+      iframe: "Conteúdo Embutido"
     };
     return labels[type] || type;
   };
@@ -99,7 +230,7 @@ export default function ModuleManager() {
               <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
                 <ChevronLeft className="w-5 h-5 text-white" />
               </div>
-              <span className="font-bold text-white">PowerBI Academy</span>
+              <span className="font-bold text-white">Eduqly Academy</span>
             </a>
           </div>
           <div className="flex gap-2">
@@ -156,12 +287,38 @@ export default function ModuleManager() {
                 {/* Module Header */}
                 <div className="flex items-center justify-between">
                   <h1 className="text-3xl font-bold text-white">Módulo {selectedModule.id}: {selectedModule.title}</h1>
-                  <Button
-                    onClick={() => setIsEditing(!isEditing)}
-                    className={isEditing ? "bg-green-600 hover:bg-green-700" : "bg-purple-600 hover:bg-purple-700"}
-                  >
-                    {isEditing ? "Salvar Alterações" : "Editar Módulo"}
-                  </Button>
+                  <div className="flex gap-2">
+                    {isEditing && (
+                      <Button
+                        onClick={() => {
+                          setIsEditing(false);
+                          // Revert changes
+                          setEditData({
+                            title: selectedModule.title || "",
+                            instructor: selectedModule.instructor || "",
+                            duration: selectedModule.duration || "",
+                            format: selectedModule.format || "",
+                            description: selectedModule.description || ""
+                          });
+                        }}
+                        className="bg-red-600 hover:bg-red-700"
+                      >
+                        Cancelar
+                      </Button>
+                    )}
+                    <Button
+                      onClick={() => {
+                        if (isEditing) {
+                          handleSaveModule();
+                        } else {
+                          setIsEditing(true);
+                        }
+                      }}
+                      className={isEditing ? "bg-green-600 hover:bg-green-700" : "bg-purple-600 hover:bg-purple-700"}
+                    >
+                      {isEditing ? "Salvar Alterações" : "Editar Módulo"}
+                    </Button>
+                  </div>
                 </div>
 
                 {/* Module Info */}
@@ -174,7 +331,8 @@ export default function ModuleManager() {
                       <label className="block text-sm font-medium text-slate-300 mb-2">Título</label>
                       <Input
                         disabled={!isEditing}
-                        defaultValue={selectedModule.title}
+                        value={editData.title}
+                        onChange={(e) => setEditData({ ...editData, title: e.target.value })}
                         className="bg-slate-900 border-slate-700 text-white"
                       />
                     </div>
@@ -182,7 +340,8 @@ export default function ModuleManager() {
                       <label className="block text-sm font-medium text-slate-300 mb-2">Instrutor(a)</label>
                       <Input
                         disabled={!isEditing}
-                        defaultValue={selectedModule.instructor}
+                        value={editData.instructor}
+                        onChange={(e) => setEditData({ ...editData, instructor: e.target.value })}
                         className="bg-slate-900 border-slate-700 text-white"
                       />
                     </div>
@@ -191,7 +350,8 @@ export default function ModuleManager() {
                         <label className="block text-sm font-medium text-slate-300 mb-2">Duração</label>
                         <Input
                           disabled={!isEditing}
-                          defaultValue={selectedModule.duration}
+                          value={editData.duration}
+                          onChange={(e) => setEditData({ ...editData, duration: e.target.value })}
                           className="bg-slate-900 border-slate-700 text-white"
                         />
                       </div>
@@ -199,7 +359,8 @@ export default function ModuleManager() {
                         <label className="block text-sm font-medium text-slate-300 mb-2">Formato</label>
                         <Input
                           disabled={!isEditing}
-                          defaultValue={selectedModule.format}
+                          value={editData.format}
+                          onChange={(e) => setEditData({ ...editData, format: e.target.value })}
                           className="bg-slate-900 border-slate-700 text-white"
                         />
                       </div>
@@ -208,7 +369,8 @@ export default function ModuleManager() {
                       <label className="block text-sm font-medium text-slate-300 mb-2">Descrição "Sobre esta aula"</label>
                       <Textarea
                         disabled={!isEditing}
-                        defaultValue={selectedModule.description}
+                        value={editData.description}
+                        onChange={(e) => setEditData({ ...editData, description: e.target.value })}
                         className="bg-slate-900 border-slate-700 text-white min-h-24"
                       />
                     </div>
@@ -261,120 +423,115 @@ export default function ModuleManager() {
                       </div>
                     )}
 
-                    {/* Add Material Section */}
-                    {isEditing && (
-                      <div className="pt-4 border-t border-slate-700">
-                        {!showAddMaterial ? (
-                          <Button
-                            onClick={() => setShowAddMaterial(true)}
-                            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                    {/* Add Material Button */}
+                    {isEditing && !showAddMaterial && (
+                      <Button
+                        onClick={() => setShowAddMaterial(true)}
+                        className="w-full bg-purple-600 hover:bg-purple-700"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Adicionar Material
+                      </Button>
+                    )}
+
+                    {/* Add Material Form */}
+                    {isEditing && showAddMaterial && (
+                      <div className="p-4 bg-slate-900 rounded border border-slate-700 space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-slate-300 mb-2">Tipo de Material</label>
+                          <select
+                            value={newMaterialType}
+                            onChange={(e) => setNewMaterialType(e.target.value)}
+                            className="w-full bg-slate-800 border border-slate-700 text-white rounded px-3 py-2"
                           >
-                            <Plus className="w-4 h-4 mr-2" />
-                            Adicionar Material
-                          </Button>
-                        ) : (
-                          <div className="space-y-4 p-4 bg-slate-900 rounded border border-slate-700">
-                            <div className="flex items-center justify-between mb-4">
-                              <h3 className="text-white font-semibold">Novo Material</h3>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => setShowAddMaterial(false)}
-                                className="text-slate-400 hover:text-white"
-                              >
-                                <X className="w-4 h-4" />
-                              </Button>
-                            </div>
+                            <option value="">Selecione um tipo</option>
+                            <option value="youtube">YouTube</option>
+                            <option value="video">Vídeo (MP4)</option>
+                            <option value="audio">Áudio</option>
+                            <option value="pdf">PDF</option>
+                            <option value="powerpoint">PowerPoint</option>
+                            <option value="webpage">Página Web</option>
+                            <option value="iframe">Conteúdo Embutido (iframe)</option>
+                          </select>
+                        </div>
 
-                            {/* Material Type Selection */}
-                            <div>
-                              <label className="block text-sm font-medium text-slate-300 mb-2">Tipo de Material</label>
-                              <div className="grid grid-cols-2 gap-2">
-                                {[
-                                  { id: "webpage", label: "Página Web", icon: Globe },
-                                  { id: "youtube", label: "Vídeo YouTube", icon: Youtube },
-                                  { id: "file", label: "Arquivo", icon: FileText },
-                                  { id: "audio", label: "Áudio", icon: Music }
-                                ].map((type) => (
-                                  <button
-                                    key={type.id}
-                                    onClick={() => setNewMaterialType(type.id)}
-                                    className={`p-3 rounded border transition flex items-center gap-2 ${
-                                      newMaterialType === type.id
-                                        ? "bg-purple-600/20 border-purple-500 text-purple-300"
-                                        : "bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-600"
-                                    }`}
-                                  >
-                                    <type.icon className="w-4 h-4" />
-                                    <span className="text-sm">{type.label}</span>
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
+                        <div>
+                          <label className="block text-sm font-medium text-slate-300 mb-2">Nome do Material</label>
+                          <Input
+                            value={newMaterialData.name}
+                            onChange={(e) => setNewMaterialData({ ...newMaterialData, name: e.target.value })}
+                            placeholder="Ex: Aula 1 - Introdução"
+                            className="bg-slate-800 border-slate-700 text-white"
+                          />
+                        </div>
 
-                            {/* Material Details */}
-                            {newMaterialType && (
-                              <>
-                                <div>
-                                  <label className="block text-sm font-medium text-slate-300 mb-2">Nome do Material</label>
-                                  <Input
-                                    placeholder="Ex: Introdução ao Power BI"
-                                    value={newMaterialData.name}
-                                    onChange={(e) => setNewMaterialData({ ...newMaterialData, name: e.target.value })}
-                                    className="bg-slate-800 border-slate-700 text-white"
-                                  />
-                                </div>
-
-                                {(newMaterialType === "webpage" || newMaterialType === "youtube") && (
-                                  <div>
-                                    <label className="block text-sm font-medium text-slate-300 mb-2">
-                                      {newMaterialType === "youtube" ? "URL do Vídeo YouTube" : "URL da Página"}
-                                    </label>
-                                    <Input
-                                      placeholder={newMaterialType === "youtube" ? "https://youtube.com/watch?v=..." : "https://..."}
-                                      value={newMaterialData.url}
-                                      onChange={(e) => setNewMaterialData({ ...newMaterialData, url: e.target.value })}
-                                      className="bg-slate-800 border-slate-700 text-white"
-                                    />
-                                  </div>
-                                )}
-
-                                {(newMaterialType === "file" || newMaterialType === "audio") && (
-                                  <div>
-                                    <label className="block text-sm font-medium text-slate-300 mb-2">
-                                      {newMaterialType === "audio" ? "Arquivo de Áudio" : "Arquivo"}
-                                    </label>
-                                    <Input
-                                      type="file"
-                                      onChange={(e) => setNewMaterialData({ ...newMaterialData, file: e.target.files?.[0] || null })}
-                                      className="bg-slate-800 border-slate-700 text-white"
-                                    />
-                                  </div>
-                                )}
-
-                                <div className="flex gap-2 pt-2">
-                                  <Button
-                                    onClick={handleAddMaterial}
-                                    className="flex-1 bg-green-600 hover:bg-green-700"
-                                  >
-                                    Adicionar
-                                  </Button>
-                                  <Button
-                                    onClick={() => {
-                                      setShowAddMaterial(false);
-                                      setNewMaterialType("");
-                                      setNewMaterialData({ name: "", url: "", file: null });
-                                    }}
-                                    variant="outline"
-                                    className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-800"
-                                  >
-                                    Cancelar
-                                  </Button>
-                                </div>
-                              </>
-                            )}
+                        {newMaterialType === "audio" && (
+                          <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-2">Upload de Áudio</label>
+                            <input
+                              type="file"
+                              accept="audio/*"
+                              onChange={(e) => {
+                                if (e.target.files?.[0]) {
+                                  handleUploadAudio(e.target.files[0]);
+                                }
+                              }}
+                              disabled={isUploadingAudio}
+                              className="w-full bg-slate-800 border border-slate-700 text-white rounded px-3 py-2"
+                            />
+                            {isUploadingAudio && <p className="text-sm text-slate-400 mt-2">Enviando...</p>}
                           </div>
                         )}
+
+                        {newMaterialType && newMaterialType !== "audio" && (
+                          <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-2">
+                              {newMaterialType === "iframe" ? "Código iframe ou URL" : "URL do Material"}
+                            </label>
+                            <Input
+                              value={newMaterialData.url}
+                              onChange={(e) => setNewMaterialData({ ...newMaterialData, url: e.target.value })}
+                              placeholder={newMaterialType === "iframe" ? "Cole o código iframe ou URL" : "https://..."}
+                              className="bg-slate-800 border-slate-700 text-white"
+                            />
+                          </div>
+                        )}
+
+                        {newMaterialType === "iframe" && (
+                          <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-2">Código iframe</label>
+                            <Textarea
+                              value={newMaterialData.iframeCode}
+                              onChange={(e) => setNewMaterialData({ ...newMaterialData, iframeCode: e.target.value })}
+                              placeholder="<iframe src='...' ...></iframe>"
+                              className="bg-slate-800 border-slate-700 text-white min-h-20"
+                            />
+                          </div>
+                        )}
+
+                        {materialError && (
+                          <p className="text-sm text-red-400">{materialError}</p>
+                        )}
+
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={handleAddMaterial}
+                            className="flex-1 bg-green-600 hover:bg-green-700"
+                          >
+                            Adicionar
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              setShowAddMaterial(false);
+                              setNewMaterialType("");
+                              setNewMaterialData({ name: "", url: "", file: null, iframeCode: "" });
+                              setMaterialError("");
+                            }}
+                            className="flex-1 bg-slate-700 hover:bg-slate-600"
+                          >
+                            Cancelar
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </CardContent>
@@ -388,8 +545,8 @@ export default function ModuleManager() {
       {/* Preview Modal */}
       {previewFile && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="bg-slate-800 border-slate-700 max-w-2xl w-full">
-            <CardHeader className="flex items-center justify-between">
+          <Card className="bg-slate-800 border-slate-700 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-white">{previewFile.name}</CardTitle>
               <Button
                 size="sm"
@@ -397,23 +554,29 @@ export default function ModuleManager() {
                 onClick={() => setPreviewFile(null)}
                 className="text-slate-400 hover:text-white"
               >
-                ✕
+                <X className="w-4 h-4" />
               </Button>
             </CardHeader>
             <CardContent>
-              <div className="bg-slate-900 rounded p-8 text-center text-slate-400">
-                <div className="flex justify-center mb-4">
-                  {getMaterialIcon(previewFile.type)}
-                </div>
-                <p className="font-semibold text-white mb-2">{getMaterialTypeLabel(previewFile.type)}</p>
-                <p>{previewFile.name}</p>
-                {previewFile.url && (
-                  <div className="mt-4">
-                    <p className="text-sm text-slate-300 mb-2">URL:</p>
-                    <p className="text-xs break-all bg-slate-800 p-2 rounded">{previewFile.url}</p>
-                  </div>
-                )}
-              </div>
+              {previewFile.type === "video" && previewFile.url && (
+                <video controls className="w-full rounded">
+                  <source src={previewFile.url} type="video/mp4" />
+                </video>
+              )}
+              {previewFile.type === "audio" && previewFile.url && (
+                <audio controls className="w-full">
+                  <source src={previewFile.url} />
+                </audio>
+              )}
+              {previewFile.type === "pdf" && previewFile.url && (
+                <iframe src={previewFile.url} className="w-full h-96 rounded" />
+              )}
+              {previewFile.type === "webpage" && previewFile.url && (
+                <iframe src={previewFile.url} className="w-full h-96 rounded" />
+              )}
+              {previewFile.type === "iframe" && previewFile.iframeCode && (
+                <div dangerouslySetInnerHTML={{ __html: previewFile.iframeCode }} />
+              )}
             </CardContent>
           </Card>
         </div>
@@ -421,3 +584,4 @@ export default function ModuleManager() {
     </div>
   );
 }
+

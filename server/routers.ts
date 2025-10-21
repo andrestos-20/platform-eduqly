@@ -4,6 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { getAllModules, getModuleById, updateModule, createModule, verifyAdminCredentials, getAdminByEmail, getAllStudents, getStudentById, createStudent, updateStudent, deleteStudent, verifyStudentCredentials } from "./db";
+import { storagePut } from "./storage";
 
 export const appRouter = router({
   system: systemRouter,
@@ -23,6 +24,7 @@ export const appRouter = router({
     login: publicProcedure
       .input(z.object({ email: z.string().email(), ra: z.string() }))
       .mutation(async ({ input }) => {
+        
         const isValid = await verifyAdminCredentials(input.email, input.ra);
         if (!isValid) {
           throw new Error("Email ou RA inválido");
@@ -84,6 +86,32 @@ export const appRouter = router({
     getById: publicProcedure
       .input(z.object({ id: z.number() }))
       .query(({ input }) => getModuleById(input.id)),
+    uploadAudio: publicProcedure
+      .input(z.object({
+        fileName: z.string(),
+        fileData: z.string(), // base64 encoded file data
+        contentType: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          // Decode base64 to buffer
+          const buffer = Buffer.from(input.fileData, 'base64');
+          
+          // Upload to storage
+          const timestamp = Date.now();
+          const storagePath = `audio/${timestamp}-${input.fileName}`;
+          const result = await storagePut(storagePath, buffer, input.contentType || 'audio/mpeg');
+          
+          return {
+            success: true,
+            url: result.url,
+            key: result.key,
+          };
+        } catch (error) {
+          console.error('Error uploading audio:', error);
+          throw new Error(`Falha ao fazer upload do arquivo: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+        }
+      }),
     update: publicProcedure
       .input(z.object({
         id: z.number(),

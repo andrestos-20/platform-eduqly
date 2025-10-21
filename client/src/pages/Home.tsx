@@ -1,12 +1,12 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronDown, CheckCircle2, BarChart3, Zap, Users, Award, Settings } from "lucide-react";
+import { ChevronDown, CheckCircle2, BarChart3, Zap, Users, Award, Settings, Moon, Sun } from "lucide-react";
 import { useState } from "react";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function Home() {
-  // The userAuth hooks provides authentication state
-  // To implement login/logout functionality, simply call logout() or redirect to getLoginUrl()
+  const { theme, toggleTheme } = useTheme();
   let { user, loading, error, isAuthenticated, logout } = useAuth();
 
   const [expandedModule, setExpandedModule] = useState<number | null>(null);
@@ -94,27 +94,34 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Navigation */}
       <nav className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur border-b border-slate-700">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between"> {/* Reduced py */}
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-              <BarChart3 className="w-5 h-5 text-white" />
+            <div className="w-7 h-7 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center"> {/* Reduced size */}
+              <BarChart3 className="w-4 h-4 text-white" /> {/* Reduced size */}
             </div>
-            <span className="font-bold text-white text-lg">PowerBI Academy</span>
+            <span className="font-bold text-white text-base">Eduqly Academy</span> {/* Reduced font size */}
           </div>
-          <div className="hidden md:flex items-center gap-8">
-            <a href="#estrutura" className="text-slate-300 hover:text-white transition">Estrutura</a>
-            <a href="#beneficios" className="text-slate-300 hover:text-white transition">Beneficios</a>
-            <a href="#inscricao" className="text-slate-300 hover:text-white transition">Inscricao</a>
+          <div className="hidden md:flex items-center gap-6"> {/* Reduced gap */}
+            <a href="#estrutura" className="text-slate-300 hover:text-white transition text-sm">Estrutura</a> {/* Reduced font size */}
+            <a href="#beneficios" className="text-slate-300 hover:text-white transition text-sm">Beneficios</a> {/* Reduced font size */}
+            <a href="#inscricao" className="text-slate-300 hover:text-white transition text-sm">Inscricao</a> {/* Reduced font size */}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2"> {/* Reduced gap */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg hover:bg-slate-800 transition text-slate-300 hover:text-white"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
             <a href="/admin/login">
-              <Button variant="outline" className="border-slate-600 text-white hover:bg-slate-800 flex items-center gap-2">
-                <Settings className="w-4 h-4" />
+              <Button variant="outline" className="border-slate-600 text-white hover:bg-slate-800 flex items-center gap-1 text-xs px-3 py-1"> {/* Reduced padding/font */}
+                <Settings className="w-3 h-3" /> {/* Reduced size */}
                 <span className="hidden sm:inline">Admin</span>
               </Button>
             </a>
             <a href="/login">
-              <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+              <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-xs px-3 py-1"> {/* Reduced padding/font */}
                 Acessar Curso
               </Button>
             </a>
@@ -123,50 +130,50 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20 md:py-32">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div className="space-y-8">
-            <div className="inline-block bg-slate-800/50 border border-slate-700 rounded-full px-4 py-2">
-              <p className="text-sm text-slate-300">
+      <section className="container mx-auto px-4 py-12 md:py-16"> {/* Reduced py */}
+        <div className="grid md:grid-cols-2 gap-8 items-center"> {/* Reduced gap */}
+          <div className="space-y-4"> {/* Reduced space-y */}
+            <div className="inline-block bg-slate-800/50 border border-slate-700 rounded-full px-3 py-1"> {/* Reduced padding */}
+              <p className="text-xs text-slate-300"> {/* Reduced font size */}
                 Curso criado por alunos da Universidade UNINOVE
               </p>
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight"> {/* Reduced font sizes */}
               Transforme dados em <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">decisões inteligentes</span>
             </h1>
-            <p className="text-xl text-slate-300">
+            <p className="text-base text-slate-300"> {/* Reduced font size */}
               Aprenda Power BI aplicado a Restaurantes e Negócios. Do achismo à decisão baseada em dados.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-3"> {/* Reduced gap */}
             <a href="/login">
-              <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
+              <Button size="sm" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"> {/* Reduced size */}
                 Quero Aprender Agora
               </Button>
             </a>
-              <Button size="lg" variant="outline" className="border-slate-600 text-white hover:bg-slate-800">
+              <Button size="sm" variant="outline" className="border-slate-600 text-white hover:bg-slate-800"> {/* Reduced size */}
                 Saiba Mais
               </Button>
             </div>
-            <div className="flex items-center gap-6 pt-4">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-white">5</span>
-                <span className="text-slate-400">módulos práticos</span>
+            <div className="flex items-center gap-4 pt-2"> {/* Reduced gap and pt */}
+              <div className="flex items-center gap-1"> {/* Reduced gap */}
+                <span className="text-xl font-bold text-white">5</span> {/* Reduced font size */}
+                <span className="text-slate-400 text-sm">módulos práticos</span> {/* Reduced font size */}
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-white">1h30</span>
-                <span className="text-slate-400">de conteúdo</span>
+              <div className="flex items-center gap-1"> {/* Reduced gap */}
+                <span className="text-xl font-bold text-white">1h30</span> {/* Reduced font size */}
+                <span className="text-slate-400 text-sm">de conteúdo</span> {/* Reduced font size */}
               </div>
             </div>
           </div>
           <div className="hidden md:block">
-            <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-2xl p-8 backdrop-blur">
-              <div className="bg-slate-800 rounded-lg p-6 space-y-4">
-                <div className="h-40 bg-gradient-to-br from-slate-700 to-slate-600 rounded flex items-center justify-center">
-                  <BarChart3 className="w-16 h-16 text-slate-500" />
+            <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-xl p-6 backdrop-blur"> {/* Reduced padding/border-radius */}
+              <div className="bg-slate-800 rounded-lg p-4 space-y-3"> {/* Reduced padding/space-y */}
+                <div className="h-32 bg-gradient-to-br from-slate-700 to-slate-600 rounded flex items-center justify-center"> {/* Reduced height */}
+                  <BarChart3 className="w-12 h-12 text-slate-500" /> {/* Reduced size */}
                 </div>
-                <div className="space-y-2">
-                  <div className="h-3 bg-slate-700 rounded w-3/4"></div>
-                  <div className="h-3 bg-slate-700 rounded w-1/2"></div>
+                <div className="space-y-1"> {/* Reduced space-y */}
+                  <div className="h-2 bg-slate-700 rounded w-3/4"></div> {/* Reduced height */}
+                  <div className="h-2 bg-slate-700 rounded w-1/2"></div> {/* Reduced height */}
                 </div>
               </div>
             </div>
@@ -175,13 +182,13 @@ export default function Home() {
       </section>
 
       {/* Course Info */}
-      <section className="bg-slate-800/50 border-y border-slate-700 py-12">
+      <section className="bg-slate-800/50 border-y border-slate-700 py-8"> {/* Reduced py */}
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4"> {/* Reduced gap */}
             {courseInfo.map((info, idx) => (
               <div key={idx} className="text-center">
-                <p className="text-slate-400 text-sm mb-2">{info.label}</p>
-                <p className="text-white font-semibold text-lg">{info.value}</p>
+                <p className="text-slate-400 text-xs mb-1">{info.label}</p> {/* Reduced font size/mb */}
+                <p className="text-white font-semibold text-base">{info.value}</p> {/* Reduced font size */}
               </div>
             ))}
           </div>
@@ -189,55 +196,55 @@ export default function Home() {
       </section>
 
       {/* Modules Section */}
-      <section id="estrutura" className="container mx-auto px-4 py-20">
-        <div className="space-y-12">
-          <div className="text-center space-y-4">
-            <h2 className="text-4xl md:text-5xl font-bold text-white">Estrutura do Curso</h2>
-            <p className="text-xl text-slate-400">5 módulos práticos e interativos</p>
+      <section id="estrutura" className="container mx-auto px-4 py-16"> {/* Reduced py */}
+        <div className="space-y-8"> {/* Reduced space-y */}
+          <div className="text-center space-y-3"> {/* Reduced space-y */}
+            <h2 className="text-3xl md:text-4xl font-bold text-white">Estrutura do Curso</h2> {/* Reduced font sizes */}
+            <p className="text-lg text-slate-400">5 módulos práticos e interativos</p> {/* Reduced font size */}
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3"> {/* Reduced space-y */}
             {modules.map((module) => (
               <Card
                 key={module.id}
                 className="bg-slate-800/50 border-slate-700 hover:border-purple-500/50 transition cursor-pointer"
                 onClick={() => setExpandedModule(expandedModule === module.id ? null : module.id)}
               >
-                <CardHeader>
+                <CardHeader className="py-3 px-4"> {/* Reduced padding */}
                   <div className="flex items-start justify-between">
-                    <div className="space-y-2 flex-1">
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    <div className="space-y-1 flex-1"> {/* Reduced space-y */}
+                      <div className="flex items-center gap-2"> {/* Reduced gap */}
+                        <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"> {/* Reduced font size */}
                           Módulo {module.id}
                         </span>
-                        <span className="text-sm bg-slate-700 text-slate-300 px-3 py-1 rounded-full">
+                        <span className="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full"> {/* Reduced padding/font */}
                           {module.duration}
                         </span>
                       </div>
-                      <CardTitle className="text-white text-xl">{module.title}</CardTitle>
+                      <CardTitle className="text-white text-lg">{module.title}</CardTitle> {/* Reduced font size */}
                     </div>
                     <ChevronDown
-                      className={`w-5 h-5 text-slate-400 transition ${
+                      className={`w-4 h-4 text-slate-400 transition ${
                         expandedModule === module.id ? "rotate-180" : ""
                       }`}
                     />
                   </div>
                 </CardHeader>
                 {expandedModule === module.id && (
-                  <CardContent className="space-y-4 border-t border-slate-700 pt-4">
-                    <div className="grid md:grid-cols-2 gap-4">
+                  <CardContent className="space-y-3 border-t border-slate-700 pt-3 px-4"> {/* Reduced padding/space-y */}
+                    <div className="grid md:grid-cols-2 gap-3"> {/* Reduced gap */}
                       <div>
-                        <p className="text-slate-400 text-sm mb-1">Formato</p>
-                        <p className="text-white">{module.format}</p>
+                        <p className="text-slate-400 text-xs mb-0.5">Formato</p> {/* Reduced font size/mb */}
+                        <p className="text-white text-sm">{module.format}</p> {/* Reduced font size */}
                       </div>
                       <div>
-                        <p className="text-slate-400 text-sm mb-1">Instrutor(a)</p>
-                        <p className="text-white">{module.instructor}</p>
+                        <p className="text-slate-400 text-xs mb-0.5">Instrutor(a)</p> {/* Reduced font size/mb */}
+                        <p className="text-white text-sm">{module.instructor}</p> {/* Reduced font size */}
                       </div>
                     </div>
                     <div>
-                      <p className="text-slate-400 text-sm mb-1">Descrição</p>
-                      <p className="text-slate-300">{module.description}</p>
+                      <p className="text-slate-400 text-xs mb-0.5">Descrição</p> {/* Reduced font size/mb */}
+                      <p className="text-slate-300 text-sm">{module.description}</p> {/* Reduced font size */}
                     </div>
                   </CardContent>
                 )}
@@ -248,26 +255,26 @@ export default function Home() {
       </section>
 
       {/* Benefits Section */}
-      <section id="beneficios" className="bg-slate-800/50 border-y border-slate-700 py-20">
-        <div className="container mx-auto px-4 space-y-12">
-          <div className="text-center space-y-4">
-            <h2 className="text-4xl md:text-5xl font-bold text-white">O que você vai aprender</h2>
-            <p className="text-xl text-slate-400">Mais do que aprender Power BI, você vai aprender a enxergar oportunidades nos números</p>
+      <section id="beneficios" className="bg-slate-800/50 border-y border-slate-700 py-16"> {/* Reduced py */}
+        <div className="container mx-auto px-4 space-y-8"> {/* Reduced space-y */}
+          <div className="text-center space-y-3"> {/* Reduced space-y */}
+            <h2 className="text-3xl md:text-4xl font-bold text-white">O que você vai aprender</h2> {/* Reduced font sizes */}
+            <p className="text-lg text-slate-400">Mais do que aprender Power BI, você vai aprender a enxergar oportunidades nos números</p> {/* Reduced font size */}
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4"> {/* Reduced gap */}
             {benefits.map((benefit, idx) => {
               const Icon = benefit.icon;
               return (
-                <Card key={idx} className="bg-slate-900/50 border-slate-700 hover:border-purple-500/50 transition">
-                  <CardHeader>
-                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg flex items-center justify-center mb-4">
-                      <Icon className="w-6 h-6 text-purple-400" />
+                <Card key={idx} className="bg-slate-900/50 border-slate-700 p-4"> {/* Reduced padding */}
+                  <CardHeader className="flex-row items-center gap-3 p-0 mb-3"> {/* Reduced padding/mb */}
+                    <div className="p-2 bg-purple-600/20 rounded-lg">
+                      <Icon className="w-5 h-5 text-purple-400" /> {/* Reduced size */}
                     </div>
-                    <CardTitle className="text-white">{benefit.title}</CardTitle>
+                    <CardTitle className="text-white text-lg">{benefit.title}</CardTitle> {/* Reduced font size */}
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-slate-400">{benefit.description}</p>
+                  <CardContent className="p-0">
+                    <CardDescription className="text-slate-400 text-sm">{benefit.description}</CardDescription> {/* Reduced font size */}
                   </CardContent>
                 </Card>
               );
@@ -276,85 +283,41 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section id="inscricao" className="container mx-auto px-4 py-20">
-        <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-2xl p-12 text-center space-y-8">
-          <div className="space-y-4">
-            <h2 className="text-4xl md:text-5xl font-bold text-white">Comece sua jornada de dados agora</h2>
-            <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-              Ao final, você fará um quiz de 10 perguntas e enviará seu dashboard criado no Power BI. 70% de acertos = certificado simbólico de conclusão
-            </p>
+      {/* Call to Action Section */}
+      <section id="inscricao" className="container mx-auto px-4 py-16 text-center"> {/* Reduced py */}
+        <div className="space-y-6"> {/* Reduced space-y */}
+          <h2 className="text-3xl md:text-4xl font-bold text-white">
+            Comece sua jornada de <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">dados</span> agora
+          </h2>
+          <p className="text-lg text-slate-300 max-w-2xl mx-auto">
+            Ao final, você fará um quiz de 10 perguntas e enviará seu dashboard criado no Power BI. 70% de acertos = certificado simbólico de conclusão
+          </p>
+          <div className="flex items-center justify-center gap-6 pt-4"> {/* Reduced gap and pt */}
+            <div className="flex items-center gap-2">
+              <span className="text-xl font-bold text-white">⏱️</span>
+              <span className="text-slate-400 text-sm">Duração: 1h30</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xl font-bold text-white">🎓</span>
+              <span className="text-slate-400 text-sm">Certificado simbólico</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xl font-bold text-white">💰</span>
+              <span className="text-slate-400 text-sm">100% Gratuito</span>
+            </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="/login">
-              <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
-                Entrar no Curso Gratuito
-              </Button>
-            </a>
-            <Button size="lg" variant="outline" className="border-slate-600 text-white hover:bg-slate-800">
-              Mais Informações
+          <a href="/login">
+            <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white mt-6"> {/* Reduced mt */}
+              Quero Começar Agora
             </Button>
-          </div>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-slate-300 text-sm pt-4">
-            <div className="flex items-center gap-2">
-              <span>⏱️</span>
-              <span>Duração: 1h30</span>
-            </div>
-            <div className="hidden sm:block w-1 h-1 bg-slate-600 rounded-full"></div>
-            <div className="flex items-center gap-2">
-              <span>🎓</span>
-              <span>Certificado simbólico</span>
-            </div>
-            <div className="hidden sm:block w-1 h-1 bg-slate-600 rounded-full"></div>
-            <div className="flex items-center gap-2">
-              <span>💰</span>
-              <span>100% Gratuito</span>
-            </div>
-          </div>
+          </a>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900 border-t border-slate-700 py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                  <BarChart3 className="w-5 h-5 text-white" />
-                </div>
-                <span className="font-bold text-white">PowerBI Academy</span>
-              </div>
-              <p className="text-slate-400">Transformando dados em decisões inteligentes</p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Navegação</h4>
-              <ul className="space-y-2 text-slate-400">
-                <li><a href="#estrutura" className="hover:text-white transition">Estrutura</a></li>
-                <li><a href="#beneficios" className="hover:text-white transition">Benefícios</a></li>
-                <li><a href="#inscricao" className="hover:text-white transition">Inscrição</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Recursos</h4>
-              <ul className="space-y-2 text-slate-400">
-                <li><a href="#" className="hover:text-white transition">FAQ</a></li>
-                <li><a href="#" className="hover:text-white transition">Contato</a></li>
-                <li><a href="#" className="hover:text-white transition">Suporte</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Sobre</h4>
-              <ul className="space-y-2 text-slate-400">
-                <li><a href="#" className="hover:text-white transition">Universidade UNINOVE</a></li>
-                <li><a href="#" className="hover:text-white transition">Privacidade</a></li>
-                <li><a href="#" className="hover:text-white transition">Termos</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-slate-700 pt-8 text-center text-slate-400">
-            <p>&copy; 2025 PowerBI Academy. Todos os direitos reservados. Criado com ❤️ por alunos da UNINOVE.</p>
-          </div>
+      <footer className="bg-slate-900/95 border-t border-slate-700 py-6">
+        <div className="container mx-auto px-4 text-center text-slate-500 text-sm">
+          Eduqly Academy © 2025
         </div>
       </footer>
     </div>
