@@ -93,13 +93,13 @@ export default function Course() {
                 <Card className="bg-slate-800/50 border-slate-700">
                   <CardHeader>
                     <CardTitle className="text-white flex items-center justify-between">
-                      <span>Seu Progresso</span>
-                      <span className="text-2xl font-bold text-purple-400">{progressPercentage}%</span>
+                      <span className="text-sm">Seu Progresso</span>
+                      <span className="text-lg font-bold text-purple-400">{progressPercentage}%</span>
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <Progress value={progressPercentage} className="h-2" />
-                    <p className="text-slate-400 text-sm">{completedMinutes} de {totalDuration} minutos concluídos</p>
+                  <CardContent className="space-y-2">
+                    <Progress value={progressPercentage} className="h-1" />
+                    <p className="text-slate-400 text-xs">{completedMinutes} de {totalDuration} minutos concluídos</p>
                   </CardContent>
                 </Card>
 
@@ -120,8 +120,8 @@ export default function Course() {
 
                     {/* Description */}
                     <div className="space-y-2">
-                      <h3 className="text-lg font-semibold text-white">Sobre esta aula</h3>
-                      <p className="text-slate-300">{currentModule.description}</p>
+                      <h3 className="text-sm font-semibold text-white">Sobre esta aula</h3>
+                      <p className="text-xs text-slate-400">{currentModule.description}</p>
                     </div>
 
                     {/* Files */}
@@ -189,7 +189,7 @@ export default function Course() {
           </div>
 
           {/* Sidebar - Module List */}
-          <div className="space-y-4">
+          <div className="space-y-4 order-first md:order-last">
             <Card className="bg-slate-800/50 border-slate-700">
               <CardHeader>
                 <CardTitle className="text-white">Módulos</CardTitle>
