@@ -89,20 +89,6 @@ export default function Course() {
                   </div>
                 </div>
 
-                {/* Progress */}
-                <Card className="bg-slate-800/50 border-slate-700">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center justify-between">
-                      <span className="text-sm">Seu Progresso</span>
-                      <span className="text-lg font-bold text-purple-400">{progressPercentage}%</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <Progress value={progressPercentage} className="h-1" />
-                    <p className="text-slate-400 text-xs">{completedMinutes} de {totalDuration} minutos concluídos</p>
-                  </CardContent>
-                </Card>
-
                 {/* Module Content */}
                 <Card className="bg-slate-800/50 border-slate-700">
                   <CardHeader>
@@ -168,6 +154,18 @@ export default function Course() {
                         <ChevronRight className="w-4 h-4 ml-2" />
                       </Button>
                     </div>
+                  </CardContent>
+                </Card>
+
+                {/* Progress - Reduzido */}
+                <Card className="bg-slate-800/50 border-slate-700">
+                  <CardContent className="pt-4 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-white">Progresso</span>
+                      <span className="text-sm font-bold text-purple-400">{progressPercentage}%</span>
+                    </div>
+                    <Progress value={progressPercentage} className="h-1" />
+                    <p className="text-slate-400 text-xs">{completedMinutes} de {totalDuration} min</p>
                   </CardContent>
                 </Card>
 
