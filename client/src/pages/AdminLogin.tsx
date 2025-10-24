@@ -46,7 +46,7 @@ export default function AdminLogin() {
             </div>
           </div>
           <CardTitle className="text-2xl text-white">Acesso Admin</CardTitle>
-          <p className="text-slate-400 text-sm">PowerBI Academy - Gerenciamento de Módulos</p>
+          <p className="text-slate-400 text-sm">Eduqly Academy - Gerenciamento de Módulos</p>
         </CardHeader>
 
         <CardContent>
