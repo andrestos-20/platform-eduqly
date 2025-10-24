@@ -122,9 +122,7 @@ export default function Home() {
           <div className="hidden md:block">
             <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-2xl p-8 backdrop-blur">
               <div className="bg-slate-800 rounded-lg p-6 space-y-4">
-                <div className="h-40 bg-gradient-to-br from-slate-700 to-slate-600 rounded flex items-center justify-center">
-                  <BarChart3 className="w-16 h-16 text-slate-500" />
-                </div>
+          <img src="/data-analysis.png" alt="Pessoa analisando dados" className="h-40 w-full object-cover rounded" />
                 <div className="space-y-2">
                   <div className="h-3 bg-slate-700 rounded w-3/4"></div>
                   <div className="h-3 bg-slate-700 rounded w-1/2"></div>
