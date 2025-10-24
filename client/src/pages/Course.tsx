@@ -69,22 +69,22 @@ export default function Course() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-4">
           {/* Main Content Area */}
-          <div className="md:col-span-2 space-y-6">
+          <div className="md:col-span-2 space-y-4">
             {currentModule && (
               <>
                 {/* Module Title */}
-                <div className="space-y-2">
-                  <h1 className="text-4xl font-bold text-white">{currentModule.title}</h1>
-                  <div className="flex items-center gap-4 text-slate-400">
-                    <div className="flex items-center gap-2">
-                      <User className="w-4 h-4" />
-                      <span>{currentModule.instructor}</span>
+                <div className="space-y-1">
+                  <h1 className="text-2xl font-bold text-white">{currentModule.title}</h1>
+                  <div className="flex items-center gap-3 text-slate-400 text-sm">
+                    <div className="flex items-center gap-1">
+                      <User className="w-3 h-3" />
+                      <span className="text-xs">{currentModule.instructor}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4" />
-                      <span>{currentModule.duration}</span>
+                    <div className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      <span className="text-xs">{currentModule.duration}</span>
                     </div>
                   </div>
                 </div>
@@ -94,9 +94,9 @@ export default function Course() {
                   <CardHeader>
                     <CardTitle className="text-white">Conteúdo do Módulo</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="space-y-4">
                     {/* Video/Audio Player */}
-                    <div className="bg-slate-900 rounded-lg p-8 flex items-center justify-center min-h-64">
+                    <div className="bg-slate-900 rounded-lg p-4 flex items-center justify-center min-h-96">
                       <div className="text-center space-y-4">
                         <Play className="w-16 h-16 text-purple-500 mx-auto" />
                         <p className="text-slate-400">Player de mídia</p>
@@ -112,8 +112,8 @@ export default function Course() {
 
                     {/* Files */}
                     {currentModule.files && currentModule.files.length > 0 && (
-                      <div className="space-y-3">
-                        <h3 className="text-lg font-semibold text-white">Recursos</h3>
+                      <div className="space-y-2">
+                        <h3 className="text-sm font-semibold text-white">Recursos</h3>
                         {currentModule.files.map((file) => (
                           <div key={file.id} className="flex items-center justify-between p-3 bg-slate-900 rounded border border-slate-700">
                             <div className="flex items-center gap-3">
