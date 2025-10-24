@@ -452,7 +452,6 @@ export default function AdminStudents() {
                 </div>
               )}
             </div>
-            </div>
           </CardContent>
         </Card>
       </div>
