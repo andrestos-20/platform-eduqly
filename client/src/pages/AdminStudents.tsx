@@ -88,25 +88,25 @@ export default function AdminStudents() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 md:p-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-white">Gerenciar Alunos</h1>
-            <p className="text-slate-400 mt-2">Adicione, edite ou remova alunos do curso</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-white">Gerenciar Alunos</h1>
+            <p className="text-slate-400 mt-2 text-sm md:text-base">Adicione, edite ou remova alunos do curso</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full md:w-auto">
             <Button
               onClick={() => setLocation("/admin/modulos")}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+              className="flex-1 md:flex-none bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-sm md:text-base"
             >
               📚 Módulos
             </Button>
             <Button
               onClick={() => setLocation("/")}
               variant="outline"
-              className="border-slate-600 text-white hover:bg-slate-800"
+              className="flex-1 md:flex-none border-slate-600 text-white hover:bg-slate-800 text-sm md:text-base"
             >
               ← Voltar
             </Button>
@@ -116,37 +116,37 @@ export default function AdminStudents() {
         {/* Add Student Form */}
         <Card className="bg-slate-800/50 border-slate-700 mb-8">
           <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
+            <CardTitle className="text-white flex items-center gap-2 text-lg md:text-xl">
               <Plus className="w-5 h-5" />
               Adicionar Novo Aluno
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
               <Input
                 placeholder="Nome completo"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="bg-slate-900 border-slate-700 text-white"
+                className="bg-slate-900 border-slate-700 text-white text-sm md:text-base"
               />
               <Input
                 type="email"
                 placeholder="Email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="bg-slate-900 border-slate-700 text-white"
+                className="bg-slate-900 border-slate-700 text-white text-sm md:text-base"
               />
               <Input
                 type="password"
                 placeholder="Senha"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="bg-slate-900 border-slate-700 text-white"
+                className="bg-slate-900 border-slate-700 text-white text-sm md:text-base"
               />
               <select
                 value={formData.isActive}
                 onChange={(e) => setFormData({ ...formData, isActive: e.target.value })}
-                className="bg-slate-900 border border-slate-700 text-white rounded px-3 py-2"
+                className="bg-slate-900 border border-slate-700 text-white rounded px-3 py-2 text-sm md:text-base"
               >
                 <option value="true">Ativo</option>
                 <option value="false">Inativo</option>
@@ -154,7 +154,7 @@ export default function AdminStudents() {
             </div>
             <Button
               onClick={handleAddStudent}
-              className="w-full mt-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+              className="w-full mt-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-sm md:text-base"
             >
               <Plus className="w-4 h-4 mr-2" />
               Adicionar Aluno
@@ -170,7 +170,147 @@ export default function AdminStudents() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
+            {/* Mobile View - Cards */}
+            <div className="md:hidden space-y-4">
+              {students.map((student) => (
+                <div key={student.id} className="bg-slate-700/30 rounded-lg p-4 border border-slate-700">
+                  <div className="mb-3">
+                    {editingId === student.id ? (
+                      <Input
+                        value={student.name}
+                        onChange={(e) =>
+                          setStudents(
+                            students.map((s) =>
+                              s.id === student.id ? { ...s, name: e.target.value } : s
+                            )
+                          )
+                        }
+                        className="bg-slate-900 border-slate-700 text-white text-sm"
+                        placeholder="Nome"
+                      />
+                    ) : (
+                      <h3 className="text-white font-semibold text-sm">{student.name}</h3>
+                    )}
+                  </div>
+                  <div className="space-y-2 text-xs md:text-sm">
+                    <div>
+                      <span className="text-slate-400">Email:</span>
+                      {editingId === student.id ? (
+                        <Input
+                          type="email"
+                          value={student.email}
+                          onChange={(e) =>
+                            setStudents(
+                              students.map((s) =>
+                                s.id === student.id ? { ...s, email: e.target.value } : s
+                              )
+                            )
+                          }
+                          className="bg-slate-900 border-slate-700 text-white text-xs mt-1"
+                          placeholder="Email"
+                        />
+                      ) : (
+                        <p className="text-slate-300">{student.email}</p>
+                      )}
+                    </div>
+                    <div>
+                      <span className="text-slate-400">Senha:</span>
+                      <div className="flex items-center gap-2 mt-1">
+                        {editingId === student.id ? (
+                          <Input
+                            type={showPassword[student.id] ? "text" : "password"}
+                            value={student.password}
+                            onChange={(e) =>
+                              setStudents(
+                                students.map((s) =>
+                                  s.id === student.id ? { ...s, password: e.target.value } : s
+                                )
+                              )
+                            }
+                            className="bg-slate-900 border-slate-700 text-white text-xs flex-1"
+                            placeholder="Senha"
+                          />
+                        ) : (
+                          <span className="font-mono text-xs bg-slate-900 px-2 py-1 rounded flex-1">
+                            {student.password}
+                          </span>
+                        )}
+                        <button
+                          onClick={() =>
+                            setShowPassword({
+                              ...showPassword,
+                              [student.id]: !showPassword[student.id],
+                            })
+                          }
+                          className="text-slate-400 hover:text-white"
+                        >
+                          {showPassword[student.id] ? (
+                            <EyeOff className="w-4 h-4" />
+                          ) : (
+                            <Eye className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-slate-400">Status:</span>
+                      <p className="text-slate-300">
+                        <span
+                          className={`px-2 py-1 rounded text-xs font-semibold ${
+                            student.isActive === "true"
+                              ? "bg-green-500/20 text-green-400"
+                              : "bg-red-500/20 text-red-400"
+                          }`}
+                        >
+                          {student.isActive === "true" ? "Ativo" : "Inativo"}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 mt-4">
+                    {editingId === student.id ? (
+                      <>
+                        <button
+                          onClick={() => handleUpdateStudent(student.id)}
+                          className="flex-1 p-2 bg-green-600 hover:bg-green-700 rounded text-white text-xs font-semibold flex items-center justify-center gap-1"
+                        >
+                          <Check className="w-4 h-4" /> Salvar
+                        </button>
+                        <button
+                          onClick={() => setEditingId(null)}
+                          className="flex-1 p-2 bg-slate-600 hover:bg-slate-700 rounded text-white text-xs font-semibold flex items-center justify-center gap-1"
+                        >
+                          <X className="w-4 h-4" /> Cancelar
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => setEditingId(student.id)}
+                          className="flex-1 p-2 bg-blue-600 hover:bg-blue-700 rounded text-white text-xs font-semibold flex items-center justify-center gap-1"
+                        >
+                          <Edit className="w-4 h-4" /> Editar
+                        </button>
+                        <button
+                          onClick={() => handleDeleteStudent(student.id)}
+                          className="flex-1 p-2 bg-red-600 hover:bg-red-700 rounded text-white text-xs font-semibold flex items-center justify-center gap-1"
+                        >
+                          <Trash2 className="w-4 h-4" /> Deletar
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {students.length === 0 && (
+                <div className="text-center py-8 text-slate-400">
+                  Nenhum aluno cadastrado ainda. Adicione um novo aluno acima!
+                </div>
+              )}
+            </div>
+
+            {/* Desktop View - Table */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-700">
@@ -311,6 +451,7 @@ export default function AdminStudents() {
                   Nenhum aluno cadastrado ainda. Adicione um novo aluno acima!
                 </div>
               )}
+            </div>
             </div>
           </CardContent>
         </Card>
