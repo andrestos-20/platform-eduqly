@@ -2,38 +2,90 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ChevronLeft, Trash2, Eye, Plus, Loader } from "lucide-react";
-import { useState } from "react";
+import { ChevronLeft, Trash2, Eye, Plus, Loader, Save, X } from "lucide-react";
+import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 
 export default function ModuleManager() {
-  const { data: modules = [], isLoading } = trpc.modules.list.useQuery();
+  const { data: modules = [], isLoading, refetch } = trpc.modules.list.useQuery();
   const updateModuleMutation = trpc.modules.update.useMutation();
   const [selectedModuleId, setSelectedModuleId] = useState(modules[0]?.id || 1);
   const [isEditing, setIsEditing] = useState(false);
   const [previewFile, setPreviewFile] = useState<any>(null);
+  
+  // Estado local para edição
+  const [editData, setEditData] = useState({
+    title: "",
+    instructor: "",
+    duration: "",
+    format: "",
+    description: "",
+  });
 
   const selectedModule = modules.find(m => m.id === selectedModuleId);
 
-  const handleSaveModule = async (updates: any) => {
+  // Atualizar editData quando o módulo selecionado muda
+  useEffect(() => {
+    if (selectedModule) {
+      setEditData({
+        title: selectedModule.title || "",
+        instructor: selectedModule.instructor || "",
+        duration: selectedModule.duration || "",
+        format: selectedModule.format || "",
+        description: selectedModule.description || "",
+      });
+    }
+  }, [selectedModule]);
+
+  const handleSaveModule = async () => {
     if (!selectedModule) return;
     
     try {
       await updateModuleMutation.mutateAsync({
         id: selectedModule.id,
-        ...updates,
+        title: editData.title,
+        instructor: editData.instructor,
+        duration: editData.duration,
+        format: editData.format,
+        description: editData.description,
       });
+      
+      // Refetch para atualizar os dados
+      await refetch();
       setIsEditing(false);
     } catch (error) {
       console.error("Erro ao salvar módulo:", error);
+      alert("Erro ao salvar módulo. Tente novamente.");
     }
+  };
+
+  const handleCancelEdit = () => {
+    // Restaurar dados originais
+    if (selectedModule) {
+      setEditData({
+        title: selectedModule.title,
+        instructor: selectedModule.instructor,
+        duration: selectedModule.duration,
+        format: selectedModule.format,
+        description: selectedModule.description,
+      });
+    }
+    setIsEditing(false);
   };
 
   const handleDeleteFile = async (fileId: string) => {
     if (!selectedModule) return;
     
     const updatedFiles = selectedModule.files.filter(f => f.id !== fileId);
-    await handleSaveModule({ files: updatedFiles });
+    try {
+      await updateModuleMutation.mutateAsync({
+        id: selectedModule.id,
+        files: updatedFiles,
+      });
+      await refetch();
+    } catch (error) {
+      console.error("Erro ao deletar arquivo:", error);
+    }
   };
 
   const handleAddFile = async (type: string) => {
@@ -43,11 +95,20 @@ export default function ModuleManager() {
       id: `file-${Date.now()}`,
       type: type as any,
       name: `Novo ${type}`,
+      url: "",
       uploadedAt: new Date().toISOString(),
     };
     
     const updatedFiles = [...selectedModule.files, newFile];
-    await handleSaveModule({ files: updatedFiles });
+    try {
+      await updateModuleMutation.mutateAsync({
+        id: selectedModule.id,
+        files: updatedFiles,
+      });
+      await refetch();
+    } catch (error) {
+      console.error("Erro ao adicionar arquivo:", error);
+    }
   };
 
   if (isLoading) {
@@ -71,7 +132,7 @@ export default function ModuleManager() {
               <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
                 <ChevronLeft className="w-5 h-5 text-white" />
               </div>
-              <span className="font-bold text-white">PowerBI Academy</span>
+              <span className="font-bold text-white">Eduqly Academy</span>
             </a>
           </div>
           <div className="flex gap-2">
@@ -126,14 +187,38 @@ export default function ModuleManager() {
             {selectedModule && (
               <>
                 {/* Module Header */}
-                <div className="flex items-center justify-between">
-                  <h1 className="text-3xl font-bold text-white">Módulo {selectedModule.id}: {selectedModule.title}</h1>
-                  <Button
-                    onClick={() => setIsEditing(!isEditing)}
-                    className={isEditing ? "bg-green-600 hover:bg-green-700" : "bg-purple-600 hover:bg-purple-700"}
-                  >
-                    {isEditing ? "Salvar Alterações" : "Editar Módulo"}
-                  </Button>
+                <div className="flex items-center justify-between gap-4">
+                  <h1 className="text-2xl md:text-3xl font-bold text-white">
+                    Módulo {selectedModule.id}: {editData.title || selectedModule.title}
+                  </h1>
+                  <div className="flex gap-2">
+                    {isEditing ? (
+                      <>
+                        <Button
+                          onClick={handleSaveModule}
+                          className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
+                        >
+                          <Save className="w-4 h-4" />
+                          Salvar
+                        </Button>
+                        <Button
+                          onClick={handleCancelEdit}
+                          variant="outline"
+                          className="border-slate-600 text-white hover:bg-slate-800 flex items-center gap-2"
+                        >
+                          <X className="w-4 h-4" />
+                          Cancelar
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        onClick={() => setIsEditing(true)}
+                        className="bg-purple-600 hover:bg-purple-700"
+                      >
+                        ✏️ Editar Módulo
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Module Info */}
@@ -146,16 +231,20 @@ export default function ModuleManager() {
                       <label className="block text-sm font-medium text-slate-300 mb-2">Título</label>
                       <Input
                         disabled={!isEditing}
-                        defaultValue={selectedModule.title}
-                        className="bg-slate-900 border-slate-700 text-white"
+                        value={editData.title}
+                        onChange={(e) => setEditData({ ...editData, title: e.target.value })}
+                        className="bg-slate-900 border-slate-700 text-white disabled:opacity-50"
+                        placeholder="Digite o título do módulo"
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-300 mb-2">Instrutor(a)</label>
                       <Input
                         disabled={!isEditing}
-                        defaultValue={selectedModule.instructor}
-                        className="bg-slate-900 border-slate-700 text-white"
+                        value={editData.instructor}
+                        onChange={(e) => setEditData({ ...editData, instructor: e.target.value })}
+                        className="bg-slate-900 border-slate-700 text-white disabled:opacity-50"
+                        placeholder="Digite o nome do instrutor"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -163,16 +252,20 @@ export default function ModuleManager() {
                         <label className="block text-sm font-medium text-slate-300 mb-2">Duração</label>
                         <Input
                           disabled={!isEditing}
-                          defaultValue={selectedModule.duration}
-                          className="bg-slate-900 border-slate-700 text-white"
+                          value={editData.duration}
+                          onChange={(e) => setEditData({ ...editData, duration: e.target.value })}
+                          className="bg-slate-900 border-slate-700 text-white disabled:opacity-50"
+                          placeholder="Ex: 5 min"
                         />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-300 mb-2">Formato</label>
                         <Input
                           disabled={!isEditing}
-                          defaultValue={selectedModule.format}
-                          className="bg-slate-900 border-slate-700 text-white"
+                          value={editData.format}
+                          onChange={(e) => setEditData({ ...editData, format: e.target.value })}
+                          className="bg-slate-900 border-slate-700 text-white disabled:opacity-50"
+                          placeholder="Ex: Vídeo introdutório"
                         />
                       </div>
                     </div>
@@ -180,10 +273,17 @@ export default function ModuleManager() {
                       <label className="block text-sm font-medium text-slate-300 mb-2">Descrição "Sobre esta aula"</label>
                       <Textarea
                         disabled={!isEditing}
-                        defaultValue={selectedModule.description}
-                        className="bg-slate-900 border-slate-700 text-white min-h-24"
+                        value={editData.description}
+                        onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+                        className="bg-slate-900 border-slate-700 text-white min-h-24 disabled:opacity-50"
+                        placeholder="Digite a descrição da aula"
                       />
                     </div>
+                    {isEditing && (
+                      <p className="text-xs text-slate-400 mt-4">
+                        💡 Todos os campos acima são editáveis. Clique em "Salvar" para confirmar as alterações.
+                      </p>
+                    )}
                   </CardContent>
                 </Card>
 
@@ -287,3 +387,4 @@ export default function ModuleManager() {
     </div>
   );
 }
+
