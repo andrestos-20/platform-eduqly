@@ -56,7 +56,7 @@ export default function Course() {
               <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
                 <ChevronLeft className="w-5 h-5 text-white" />
               </div>
-              <span className="font-bold text-white">PowerBI Academy</span>
+              <span className="font-bold text-white">Eduqly Academy</span>
             </a>
           </div>
           <a href="/">
