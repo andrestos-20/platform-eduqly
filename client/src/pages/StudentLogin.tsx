@@ -44,7 +44,7 @@ export default function StudentLogin() {
             </div>
           </div>
           <CardTitle className="text-2xl text-white">Acesso ao Curso</CardTitle>
-          <p className="text-slate-400 text-sm">Eduqly Academy - Plataforma de Aprendizado</p>
+          <p className="text-slate-400 text-sm">PowerBI Academy - Plataforma de Aprendizado</p>
         </CardHeader>
 
         <CardContent>
@@ -115,7 +115,7 @@ export default function StudentLogin() {
         <a href="/" className="hover:text-slate-400 transition">
           ← Voltar para Home
         </a>
-        <span>Eduqly Academy © 2025</span>
+        <span>PowerBI Academy © 2025</span>
       </div>
     </div>
   );
