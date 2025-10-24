@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { ChevronRight, Play, CheckCircle2, Circle, Clock, User, Volume2, Download, Share2, MessageCircle, Loader } from "lucide-react";
+import { ChevronRight, ChevronLeft, Play, CheckCircle2, Circle, Clock, User, Volume2, Download, Share2, MessageCircle, Loader } from "lucide-react";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 
@@ -54,7 +54,7 @@ export default function Course() {
           <div className="flex items-center gap-4">
             <a href="/" className="flex items-center gap-2 hover:opacity-80 transition">
               <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                <ChevronRight className="w-5 h-5 text-white" />
+                <ChevronLeft className="w-5 h-5 text-white" />
               </div>
               <span className="font-bold text-white">PowerBI Academy</span>
             </a>
