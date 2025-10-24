@@ -353,7 +353,7 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-slate-700 pt-8 text-center text-slate-400">
-            <p>&copy; 2025 PowerBI Academy. Todos os direitos reservados. Criado com ❤️ por alunos da UNINOVE.</p>
+            <p>&copy; 2025 Eduqly Academy. Todos os direitos reservados. Criado com ❤️ por alunos da UNINOVE.</p>
           </div>
         </div>
       </footer>
