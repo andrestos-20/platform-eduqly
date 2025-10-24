@@ -99,7 +99,7 @@ export default function Home() {
             <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
               <BarChart3 className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-white text-lg">PowerBI Academy</span>
+            <span className="font-bold text-white text-lg">Eduqly Academy</span>
           </div>
           <div className="hidden md:flex items-center gap-8">
             <a href="#estrutura" className="text-slate-300 hover:text-white transition">Estrutura</a>
@@ -123,9 +123,9 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20 md:py-32">
+      <section className="container mx-auto px-4 py-12 md:py-16">
         <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div className="space-y-8">
+          <div className="space-y-6">
             <div className="inline-block bg-slate-800/50 border border-slate-700 rounded-full px-4 py-2">
               <p className="text-sm text-slate-300">
                 Curso criado por alunos da Universidade UNINOVE
@@ -175,7 +175,7 @@ export default function Home() {
       </section>
 
       {/* Course Info */}
-      <section className="bg-slate-800/50 border-y border-slate-700 py-12">
+      <section className="bg-slate-800/50 border-y border-slate-700 py-6">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
             {courseInfo.map((info, idx) => (
@@ -189,8 +189,8 @@ export default function Home() {
       </section>
 
       {/* Modules Section */}
-      <section id="estrutura" className="container mx-auto px-4 py-20">
-        <div className="space-y-12">
+      <section id="estrutura" className="container mx-auto px-4 py-12">
+        <div className="space-y-8">
           <div className="text-center space-y-4">
             <h2 className="text-4xl md:text-5xl font-bold text-white">Estrutura do Curso</h2>
             <p className="text-xl text-slate-400">5 módulos práticos e interativos</p>
@@ -248,7 +248,7 @@ export default function Home() {
       </section>
 
       {/* Benefits Section */}
-      <section id="beneficios" className="bg-slate-800/50 border-y border-slate-700 py-20">
+      <section id="beneficios" className="bg-slate-800/50 border-y border-slate-700 py-12">
         <div className="container mx-auto px-4 space-y-12">
           <div className="text-center space-y-4">
             <h2 className="text-4xl md:text-5xl font-bold text-white">O que você vai aprender</h2>
